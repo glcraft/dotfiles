@@ -1,0 +1,19 @@
+# Get editor completions based on the config schema
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# Inserts a blank line between shell prompts
+add_newline = true
+
+[character]
+success_symbol = "[\uead3](bold green)"
+error_symbol = "[\uead3](bold red)"
+
+[shell]
+disabled = false
+# nerd font powerline symbol
+powershell_indicator="\uebc7"
+bash_indicator="\uebca"
+# nu_indicator="\uf893"
+
+[lua]
+disabled = true
