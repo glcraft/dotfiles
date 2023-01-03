@@ -236,9 +236,26 @@ let light_theme = {
 }
 
 # External completer example
-# let carapace_completer = {|spans| 
-#     carapace $spans.0 nushell $spans | from json
-# }
+let carapace_completer = {|spans| 
+    carapace $spans.0 nushell $spans | from json
+}
+let has_carapace = ((which carapace | length) > 0)
+
+# Xmake completer
+let xmake_completer = {|spans| 
+  XMAKE_SKIP_HISTORY=1 XMAKE_ROOT=y xmake lua 'private.utils.complete' 0 'nospace-json' $spans | from json | sort-by value
+}
+let xrepo_completer = {|spans| 
+  XMAKE_SKIP_HISTORY=1 XMAKE_ROOT=y xmake lua 'private.xrepo.complete' 0 'nospace-json' $spans | from json | sort-by value
+}
+
+let external_completer = {|spans| 
+  {
+    spans.0: if $has_carapace { $carapace_completer } else { {|spans|{}} }
+    xmake: $xmake_completer
+    xrepo: $xrepo_completer
+  } | get $spans.0 | each {|it| do $it $spans}
+}
 
 
 # The default config record. This is where much of your global configuration is setup.
@@ -271,11 +288,11 @@ let-env config = {
     case_sensitive: false # set to true to enable case-sensitive completions
     quick: true  # set this to false to prevent auto-selecting completions when only one remains
     partial: true  # set this to false to prevent partial filling of the prompt
-    algorithm: "prefix"  # prefix or fuzzy
+    algorithm: "fuzzy"  # prefix or fuzzy
     external: {
       enable: true # set to false to prevent nushell looking into $env.PATH to find more suggestions, `false` recommended for WSL users as this look up my be very slow
       max_results: 100 # setting it lower can improve completion performance at the cost of omitting some options
-      completer: null # check 'carapace_completer' above as an example
+      completer: $external_completer # check 'carapace_completer' above as an example
     }
   }
   filesize: {
