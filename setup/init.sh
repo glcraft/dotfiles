@@ -171,7 +171,10 @@ case $PROMPT in
             echo "Starship prompt already installed!"
         fi
         # add starship to zshrc
-        cat setup/starship_zshrc.sh >> ~/.zshrc
+        cat <<EOF
+# Initialize Starship
+eval "$(starship init zsh)"
+EOF >> ~/.zshrc
         # add starship to nu config
         cat <<EOF
 # Initialize Starship
