@@ -170,20 +170,22 @@ case $PROMPT in
         else
             echo "Starship prompt already installed!"
         fi
-        cp setup/config/starship.toml ~/.config/
         # add starship to zshrc
         cat setup/starship_zshrc.sh >> ~/.zshrc
         # add starship to nu config
-        cat setup/starship_nu_config.nu >> (nu -c '$nu.config-path')
+        cat <<EOF
+# Initialize Starship
+eval "$(starship init zsh)"
+EOF >> $(nu -c '$nu.config-path')
         ;;
     2)
         echo "Installing zimfw..."
         download https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh
         echo "Installing powerlevel10k..."
-        cat << EOF >> ~/.zimrc
+        cat << EOF
 # Use powerlevel10k theme
 zmodule romkatv/powerlevel10k --use degit
-EOF
+EOF >> ~/.zimrc
         zimfw install
         cp setup/.p10k.zsh ~/
         cat setup/powerlevel10k_zshrc.sh >> ~/.zshrc
