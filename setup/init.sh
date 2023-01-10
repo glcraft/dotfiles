@@ -187,6 +187,10 @@ EOF >> $(nu -c '$nu.config-path')
 zmodule romkatv/powerlevel10k --use degit
 EOF >> ~/.zimrc
         zimfw install
+                cat <<EOF
+# To customize prompt, run `p10k configure` or edit ~/.config/.p10k.zsh.
+[[ ! -f ~/.config/.p10k.zsh ]] || source ~/.config/.p10k.zsh
+EOF >> ~/.zshrc
         ;;
     0)
         echo "Skipping prompt installation..."
