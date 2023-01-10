@@ -550,10 +550,3 @@ let-env config = {
 
 # init starship
 source ~/.cache/starship/init.nu
-
-# get path env var from other shells
-if (sys).host.name == "Windows" {
-    let-env PATH = (powershell -c 'echo $env:PATH' | split row ";")
-  } else {
-    let-env PATH = (zsh -l -c 'echo $PATH' | split row ":")
-}

@@ -60,3 +60,7 @@ let-env NU_PLUGIN_DIRS = [
 
 # To add entries to PATH (on Windows you might use Path), you can use the following pattern:
 # let-env PATH = ($env.PATH | split row (char esep) | prepend '/some/path')
+# get path env var from other shells
+if (sys).host.name != "Windows" {
+    let-env PATH = (zsh -l -c 'echo $PATH' | split row ":")
+}
