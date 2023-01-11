@@ -1,11 +1,11 @@
 #!/usr/bin/env nu
 
 def get-api [] {
-    if not "OPENAI_TOKEN" in $env {
-        error make {msg: "OPENAI_TOKEN not set"}
+    if not "OPENAI_API_KEY" in $env {
+        error make {msg: "OPENAI_API_KEY not set"}
         exit 1
     }
-    return $env.OPENAI_TOKEN
+    return $env.OPENAI_API_KEY
 }
 # Lists the currently available models, and provides basic information about each one such as the owner and availability
 # If the model is set, It retrieves a model instance, providing basic information about the model such as the owner and permissioning.
