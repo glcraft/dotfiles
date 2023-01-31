@@ -155,6 +155,7 @@ export def command [
     input?: string      # The command to run. If not provided, will use the input from the pipeline
     --shell: string     # The shell to use, defaults to $env.SHELL
     --max-tokens: int   # The maximum number of tokens to generate, defaults to 64
+    --no-interactive    # If true, will not ask to execute and will pipe the result 
 ] {
     let input = ($in | default $input)
     if $input == null {
@@ -164,13 +165,21 @@ export def command [
     let max_tokens = ($max_tokens | default 64)
     let prompt = $"#!($shell)
 # ($input), in one line: 
-"
+$ "
     let result = (completion "code-davinci-002" --prompt $prompt --temperature 0 --top-p 1.0 --frequency-penalty 0.2 --presence-penalty 0 --max-tokens $max_tokens --stop "\n"  )
     let result = $result.choices.0.text
-    if $result =~ '^\s*#\s*' {
+    let result = (if $result =~ '^\s*#\s*' {
         ($result | parse -r '^\s*#\s*(?<command>.+)$').0.command | str trim
     } else {
         $result | str trim
+    })
+    if not $no_interactive {
+        print $"(ansi green)($result)(ansi reset)"
+        if (input "execute ? (y/n) ") == "y" {
+            nu -c $"($result)"
+        }
+    } else {
+        $result
     }
 }
 # Ask any question to the OpenAI model.
@@ -184,6 +193,6 @@ export def ask [
         error make {msg: "input is required"}
     }
     let max_tokens = ($max_tokens | default 150)
-    let result = (completion $model --prompt $"($input)\n" --temperature 0.7 --top-p 1.0 --frequency-penalty 0 --presence-penalty 0 --max-tokens $max_tokens)
+    let result = (completion $model --prompt $"($input)\n" --temperature 0.7 --top-p 1.0 --frequency-penalty 0 --presence-penalty 0 --max-tokens $max_tokens )
     $result.choices.0.text | str trim
 }
