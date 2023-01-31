@@ -196,3 +196,43 @@ export def ask [
     let result = (completion $model --prompt $"($input)\n" --temperature 0.7 --top-p 1.0 --frequency-penalty 0 --presence-penalty 0 --max-tokens $max_tokens )
     $result.choices.0.text | str trim
 }
+
+export def "git diff" [
+    --max-tokens: int           # The maximum number of tokens to generate, defaults to 100
+    --no_interactive            # If true, will not ask to commit and will pipe the result
+] {
+    let git_status = (^git status | str trim)
+    if $git_status =~ "^fatal" {
+        error make {msg: $git_status}
+    }
+    let result = (^git diff --cached --no-color --raw -p)
+    if $result == "" {
+        error make {msg: "No changes"}
+    }
+    # let result = ($result | lines | each {|line| $"    ($line)"} | str join "\n")
+    let input = $"Get the git diff of the staged changes:
+```sh
+git diff --cached --no-color --raw -p
+```
+
+Result of the comand:
+```diff
+($result)
+```
+
+Commit with a message that explains the staged changes:
+```sh
+git commit -m \""
+    let max_tokens = ($max_tokens | default 2000)
+    let openai_result = (completion "code-davinci-002" --prompt $input --temperature 0.1 --top-p 1.0 --frequency-penalty 0 --presence-penalty 0 --max-tokens $max_tokens --stop '"')
+    
+    let openai_result = ($openai_result.choices.0.text | str trim)
+    if not $no_interactive {
+        print $"(ansi green)($openai_result)(ansi reset)"
+        if (input "commit with this message ? (y/n) ") == "y" {
+            git commit -m $openai_result
+        }
+    } else {
+        $openai_result
+    }
+}
