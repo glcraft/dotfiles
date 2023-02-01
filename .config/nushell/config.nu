@@ -550,3 +550,5 @@ let-env config = {
 
 # init starship
 source ~/.cache/starship/init.nu
+
+alias pwd = $env.PWD
