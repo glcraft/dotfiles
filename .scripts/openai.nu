@@ -39,7 +39,7 @@ export def models [
     } else {
         $"/($model)"
     })
-    fetch $"https://api.openai.com/v1/models($suffix)" -H ["Authorization" $"Bearer (get-api)"]
+    http get $"https://api.openai.com/v1/models($suffix)" -H ["Authorization" $"Bearer (get-api)"]
 }
 # Helper function to add a parameter to a record if it's not null.
 def add_param [name: string, value: any] {
@@ -86,7 +86,7 @@ export def completion [
         | add_param "logit_bias" $logit_bias
         | add_param "user" $user
     )
-    let result = (post "https://api.openai.com/v1/completions" -H ["Authorization" $"Bearer (get-api)"] -t 'application/json' $params)
+    let result = (http post "https://api.openai.com/v1/completions" -H ["Authorization" $"Bearer (get-api)"] -t 'application/json' $params)
     # let params = ($params | merge {prompt: $"($params.prompt)($result.choices.0.text)"})
     # export-env {
     #     let-env openai = {
@@ -138,7 +138,7 @@ export def go-on [
         | add_param "user" $user
     )
 
-    let result = (post "https://api.openai.com/v1/completions" -H ["Authorization" $"Bearer (get-api)"] -t 'application/json' $params)
+    let result = (http post "https://api.openai.com/v1/completions" -H ["Authorization" $"Bearer (get-api)"] -t 'application/json' $params)
     # let params = ($params | merge {prompt: $"($params.prompt)($result.choices.0.text)"})
     # export-env {
     #     let-env openai = {
