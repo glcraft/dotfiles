@@ -47,9 +47,38 @@ def add_param [name: string, value: any] {
         {}
     })
 }
-# Raw completion API call.
-# All parameters are optional, except for the model.
-# See https://beta.openai.com/docs/api-reference/completions/create
+# Chat completion API call. See https://platform.openai.com/docs/api-reference/chat/create
+export def chat-completion [
+    model: string                   # ID of the model to use.
+    messages: list                 # List of messages to complete from.
+    --max-tokens: int               # The maximum number of tokens to generate in the completion.
+    --temperature: number           # The temperature used to control the randomness of the completion.
+    --top-p: number                 # The top-p used to control the randomness of the completion.
+    --n: int                        # How many completions to generate for each prompt. Use carefully, as it's a token eater.
+    --stop: any                     # Up to 4 sequences where the API will stop generating further tokens.
+    --frequency-penalty: number     # A penalty to apply to each token that appears more than once in the completion.
+    --presence-penalty: number      # A penalty to apply if the specified tokens don't appear in the completion.
+    --logit-bias: record            # A record to modify the likelihood of specified tokens appearing in the completion
+    --user: string                  # A unique identifier representing your end-user.
+] {
+    
+    let params = ({ model: $model, messages: $messages } 
+        | add_param "max_tokens" $max_tokens
+        | add_param "temperature" $temperature
+        | add_param "top_p" $top_p
+        | add_param "n" $n
+        | add_param "stop" $stop
+        | add_param "frequency_penalty" $frequency_penalty
+        | add_param "presence_penalty" $presence_penalty
+        | add_param "logit_bias" $logit_bias
+        | add_param "user" $user
+    )
+    let result = (http post "https://api.openai.com/v1/chat/completions" -H ["Authorization" $"Bearer (get-api)"] -t 'application/json' $params)
+    # print ($params | to json)
+    # let result = ""
+    $result
+}
+# Raw completion API call. See https://beta.openai.com/docs/api-reference/completions/create
 export def completion [
     model: string                   # ID of the model to use.
     --prompt: string                # The prompt(s) to generate completions for
@@ -99,7 +128,6 @@ export def completion [
 # Ask for a command to run. Will return one line command.
 export def command [
     input?: string      # The command to run. If not provided, will use the input from the pipeline
-    --shell: string     # The shell to use, defaults to $env.SHELL
     --max-tokens: int   # The maximum number of tokens to generate, defaults to 64
     --no-interactive    # If true, will not ask to execute and will pipe the result 
 ] {
@@ -107,16 +135,16 @@ export def command [
     if $input == null {
         error make {msg: "input is required"}
     }
-    let shell = if $shell != null { 
-        $"#!((which $shell) | get path)" 
-    } else { 
-        "" 
-    }
     let max_tokens = ($max_tokens | default 64)
-    let prompt = $"($shell)
-# ($input), in one line: 
-$ "
-    let result = (completion "code-davinci-002" --prompt $prompt --temperature 0 --top-p 1.0 --frequency-penalty 0.2 --presence-penalty 0 --max-tokens $max_tokens --stop "\n"  )
+#     let prompt = $"($shell)
+# # ($input), in one line: 
+# $ "
+    let messages = [
+        {"role": "system", "content": "You are a command line analyzer. Write the command that best fits my request directly after the message."},
+        {"role": "user", "content": $input}
+        {"role": "assistant", "content": "```"}
+    ]
+    let result = (chat-completion "gpt-3.5-turbo" $messages --temperature 0 --top-p 1.0 --frequency-penalty 0.2 --presence-penalty 0 --max-tokens $max_tokens --stop ["```", "\n"]  )
     let result = $result.choices.0.text
     let result = (if $result =~ '^\s*#\s*' {
         ($result | parse -r '^\s*#\s*(?<command>.+)$').0.command | str trim
@@ -135,15 +163,22 @@ $ "
 # Ask any question to the OpenAI model.
 export def ask [
     input?: string                          # The question to ask. If not provided, will use the input from the pipeline
-    --model: string = "text-davinci-003"    # The model to use, defaults to text-davinci-003
+    --model: string = "gpt-3.5-turbo"    # The model to use, defaults to text-davinci-003
     --max-tokens: int                       # The maximum number of tokens to generate, defaults to 150
 ] {
     let input = ($in | default $input)
     if $input == null {
         error make {msg: "input is required"}
     }
-    let max_tokens = ($max_tokens | default 150)
-    let result = (completion $model --prompt $"($input)\n" --temperature 0.7 --top-p 1.0 --frequency-penalty 0 --presence-penalty 0 --max-tokens $max_tokens )
+    if ($input | describe) != "string" {
+        error make {msg: "input must be a string"}
+    }
+    let max_tokens = ($max_tokens | default 300)
+    let messages = [
+        {"role": "system", "content": "You are GPT-3.5, answer my question as if you were an expert in the field."},
+        {"role": "user", "content": $input}
+    ]
+    let result = (chat-completion $model $messages --temperature 0.7 --top-p 1.0 --frequency-penalty 0 --presence-penalty 0 --max-tokens $max_tokens )
     $result.choices.0.text | str trim
 }
 
@@ -174,7 +209,7 @@ Commit with a message that explains the staged changes:
 ```sh
 git commit -m \""
     let max_tokens = ($max_tokens | default 2000)
-    let openai_result = (completion "code-davinci-002" --prompt $input --temperature 0.1 --top-p 1.0 --frequency-penalty 0 --presence-penalty 0 --max-tokens $max_tokens --stop '"')
+    let openai_result = (completion "gpt-3.5-turbo" --prompt $input --temperature 0.1 --top-p 1.0 --frequency-penalty 0 --presence-penalty 0 --max-tokens $max_tokens --stop '"')
     
     let openai_result = ($openai_result.choices.0.text | str trim)
     if not $no_interactive {
@@ -191,6 +226,6 @@ git commit -m \""
 export def test [
     msg: string
 ] {
-    let openai_result = (completion "text-davinci-003" --prompt $msg)
-    $openai_result.choices
+    
+    chat-completion "gpt-3.5-turbo" [{role:"user" content:"Hello!"}] --temperature 0 --top-p 1.0 --frequency-penalty 0.2 --presence-penalty 0 --max-tokens 64 --stop "\\n"
 }
