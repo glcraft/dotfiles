@@ -28,9 +28,7 @@ def get-api [] {
     }
     return $env.OPENAI_API_KEY
 }
-# Lists the currently available models, and provides basic information about each one such as the owner and availability
-# 
-# If the model is set, It retrieves a model instance, providing basic information about the model such as the owner and permissioning.
+# Lists the OpenAI models
 export def models [
     --model: string    # The model to retrieve
 ] {
@@ -161,9 +159,13 @@ export def command [
     if $input == null {
         error make {msg: "input is required"}
     }
-    let shell = ($shell | default $env.SHELL)
+    let shell = if $shell != null { 
+        $"#!((which $shell) | get path)" 
+    } else { 
+        "" 
+    }
     let max_tokens = ($max_tokens | default 64)
-    let prompt = $"#!($shell)
+    let prompt = $"($shell)
 # ($input), in one line: 
 $ "
     let result = (completion "code-davinci-002" --prompt $prompt --temperature 0 --top-p 1.0 --frequency-penalty 0.2 --presence-penalty 0 --max-tokens $max_tokens --stop "\n"  )
@@ -235,4 +237,12 @@ git commit -m \""
     } else {
         $openai_result
     }
+}
+
+
+export def test [
+    msg: string
+] {
+    let openai_result = (completion "text-davinci-003" --prompt $msg)
+    $openai_result.choices
 }
