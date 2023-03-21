@@ -96,58 +96,6 @@ export def completion [
     # }
     $result
 }
-# (Work in progress) Continues a previous completion.
-export def go-on [
-    --model: string                 # ID of the model to use.
-    --prompt: string                # The prompt(s) to generate completions for
-    --suffix: string                # The suffix that comes after a completion of inserted text.
-    --max-tokens: int               # The maximum number of tokens to generate in the completion.
-    --temperature: number           # The temperature used to control the randomness of the completion.
-    --top-p: number                 # The top-p used to control the randomness of the completion.
-    --n: int                        # How many completions to generate for each prompt. Use carefully, as it's a token eater.
-    --logprobs: int                 # Include the log probabilities on the logprobs most likely tokens, as well the chosen tokens.
-    --echo: bool                    # Include the prompt in the returned text.
-    --stop: any                     # A list of tokens that, if encountered, will stop the completion.
-    --frequency-penalty: number     # A penalty to apply to each token that appears more than once in the completion.
-    --presence-penalty: number      # A penalty to apply if the specified tokens don't appear in the completion.
-    --best-of: int                  # Generates best_of completions server-side and returns the "best" (the one with the highest log probability per token). Use carefully, as it's a token eater.
-    --logit-bias: record            # A record to modify the likelihood of specified tokens appearing in the completion
-    --user: string                  # A unique identifier representing your end-user.
-] {
-    if not "openai" in $env {
-        error make {msg: "No previous completion"}
-    }
-    let url = $env.openai.previous.url
-    let params = ($env.openai.previous.parameters
-        | add_param "model" $model
-        | add_param "prompt" $prompt
-        | add_param "suffix" $suffix
-        | add_param "max_tokens" $max_tokens
-        | add_param "temperature" $temperature
-        | add_param "top_p" $top_p
-        | add_param "n" $n
-        | add_param "logprobs" $logprobs
-        | add_param "echo" $echo
-        | add_param "stop" $stop
-        | add_param "frequency_penalty" $frequency_penalty
-        | add_param "presence_penalty" $presence_penalty
-        | add_param "best_of" $best_of
-        | add_param "logit_bias" $logit_bias
-        | add_param "user" $user
-    )
-
-    let result = (http post "https://api.openai.com/v1/completions" -H ["Authorization" $"Bearer (get-api)"] -t 'application/json' $params)
-    # let params = ($params | merge {prompt: $"($params.prompt)($result.choices.0.text)"})
-    # export-env {
-    #     let-env openai = {
-    #         previous: {
-    #             parameters: $params
-    #             url: $url
-    #         }
-    #     }
-    # }
-    $result
-}
 # Ask for a command to run. Will return one line command.
 export def command [
     input?: string      # The command to run. If not provided, will use the input from the pipeline
