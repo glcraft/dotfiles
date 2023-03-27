@@ -47,8 +47,8 @@ def add_param [name: string, value: any] {
         {}
     })
 }
-# Chat completion API call. See https://platform.openai.com/docs/api-reference/chat/create
-export def chat-completion [
+# Chat completion API call. 
+export def "api chat-completion" [
     model: string                   # ID of the model to use.
     messages: list                 # List of messages to complete from.
     --max-tokens: int               # The maximum number of tokens to generate in the completion.
@@ -61,7 +61,7 @@ export def chat-completion [
     --logit-bias: record            # A record to modify the likelihood of specified tokens appearing in the completion
     --user: string                  # A unique identifier representing your end-user.
 ] {
-    
+    # See https://platform.openai.com/docs/api-reference/chat/create
     let params = ({ model: $model, messages: $messages } 
         | add_param "max_tokens" $max_tokens
         | add_param "temperature" $temperature
@@ -78,8 +78,8 @@ export def chat-completion [
     # let result = ""
     $result
 }
-# Raw completion API call. See https://beta.openai.com/docs/api-reference/completions/create
-export def completion [
+# Completion API call. 
+export def "api completion" [
     model: string                   # ID of the model to use.
     --prompt: string                # The prompt(s) to generate completions for
     --suffix: string                # The suffix that comes after a completion of inserted text.
@@ -96,7 +96,7 @@ export def completion [
     --logit-bias: record            # A record to modify the likelihood of specified tokens appearing in the completion
     --user: string                  # A unique identifier representing your end-user.
 ] {
-    
+    # See https://platform.openai.com/docs/api-reference/completions/create
     let params = ({ model: $model } 
         | add_param "prompt" $prompt
         | add_param "suffix" $suffix
@@ -183,7 +183,7 @@ export def command [
         {"role": "system", "content": "You are a command line analyzer. Write the command that best fits my request in a \"Command\" markdown chapter then describe each parameter used in a \"Explanation\" markdown chapter."},
         {"role": "user", "content": $input}
     ]
-    let result = (chat-completion "gpt-3.5-turbo" $messages --temperature 0 --top-p 1.0 --frequency-penalty 0.2 --presence-penalty 0 --max-tokens $max_tokens  )
+    let result = (api chat-completion "gpt-3.5-turbo" $messages --temperature 0 --top-p 1.0 --frequency-penalty 0.2 --presence-penalty 0 --max-tokens $max_tokens  )
     # return $result
     let result = $result.choices.0.message.content
     md_to_console $result
@@ -213,7 +213,7 @@ export def ask [
         {"role": "system", "content": "You are GPT-3.5, answer my question as if you were an expert in the field."},
         {"role": "user", "content": $input}
     ]
-    let result = (chat-completion $model $messages --temperature 0.7 --top-p 1.0 --frequency-penalty 0 --presence-penalty 0 --max-tokens $max_tokens )
+    let result = (api chat-completion $model $messages --temperature 0.7 --top-p 1.0 --frequency-penalty 0 --presence-penalty 0 --max-tokens $max_tokens )
     $result.choices.0.message.content | str trim
 }
 
@@ -244,7 +244,7 @@ Commit with a message that explains the staged changes:
 ```sh
 git commit -m \""
     let max_tokens = ($max_tokens | default 2000)
-    let openai_result = (completion "gpt-3.5-turbo" --prompt $input --temperature 0.1 --top-p 1.0 --frequency-penalty 0 --presence-penalty 0 --max-tokens $max_tokens --stop '"')
+    let openai_result = (api completion "gpt-3.5-turbo" --prompt $input --temperature 0.1 --top-p 1.0 --frequency-penalty 0 --presence-penalty 0 --max-tokens $max_tokens --stop '"')
     
     let openai_result = ($openai_result.choices.0.text | str trim)
     if not $no_interactive {
@@ -262,5 +262,5 @@ export def test [
     msg: string
 ] {
     
-    chat-completion "gpt-3.5-turbo" [{role:"user" content:"Hello!"}] --temperature 0 --top-p 1.0 --frequency-penalty 0.2 --presence-penalty 0 --max-tokens 64 --stop "\\n"
+    api chat-completion "gpt-3.5-turbo" [{role:"user" content:"Hello!"}] --temperature 0 --top-p 1.0 --frequency-penalty 0.2 --presence-penalty 0 --max-tokens 64 --stop "\\n"
 }
