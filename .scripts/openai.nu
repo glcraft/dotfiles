@@ -114,15 +114,6 @@ export def "api completion" [
         | add_param "user" $user
     )
     let result = (http post "https://api.openai.com/v1/completions" -H ["Authorization" $"Bearer (get-api)"] -t 'application/json' $params)
-    # let params = ($params | merge {prompt: $"($params.prompt)($result.choices.0.text)"})
-    # export-env {
-    #     let-env openai = {
-    #         previous: {
-    #             parameters: $params
-    #             url: "https://api.openai.com/v1/completions"
-    #         }
-    #     }
-    # }
     $result
 }
 def md_title [title: string] {
