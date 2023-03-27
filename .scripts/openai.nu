@@ -125,6 +125,49 @@ export def completion [
     # }
     $result
 }
+def md_title [title: string] {
+    let size = ((term size | get columns) / 2) - 4
+    let title_length = ($title | str length)
+    let left = (($size / 2) - $title_length / 2)
+    let right = ($size - $left - $title_length)
+    let line = (char -u "2500")
+    let line_stop_left = (char -u "2574")
+    let line_stop_right = (char -u "2576")
+    print $"\n(1..$left | each {|| $line } | str join)($line_stop_left)(ansi -e { fg: '#000000' bg: '#ffffff' attr: b }) ($title) (ansi reset)($line_stop_right)(1..$right | each {|| $line } | str join)\n"
+}
+def md_to_console [md: string] {
+    mut is_code = false
+    for $line in ($md | lines) {
+        if ($line =~ "^\\s*```") {
+            $is_code = (not $is_code)
+            continue
+        } 
+        if $is_code {
+            $line | nu-highlight | print
+            continue
+        }
+        mut index = 0
+        if ($line =~ '^\s*#+\s+') {
+            let name = ($line | parse -r '^\s*#+\s+(?<name>.*)$' | get 0.name)
+            # print $"\n(ansi -e { fg: '#000000' bg: '#ffffff' attr: b }) ($name) (ansi reset)\n"
+            md_title $name
+            continue
+        } else if ($line =~ '^\s*-\s+') {
+            print -n $"(char prompt) "
+            $index = ($line | parse -r '^(\s*-\s+)' | get 0.capture0 | str length)
+        }
+        mut is_inline_code = false
+        for $char in ($line | split chars | skip $index) {
+            if $char == '`' {
+                print -n (if not $is_inline_code {ansi yellow} else {ansi reset})
+                $is_inline_code = (not $is_inline_code)
+            } else {
+                print -n $char
+            }
+        }
+        print (ansi reset)
+    }
+}
 # Ask for a command to run. Will return one line command.
 export def command [
     input?: string      # The command to run. If not provided, will use the input from the pipeline
@@ -135,29 +178,21 @@ export def command [
     if $input == null {
         error make {msg: "input is required"}
     }
-    let max_tokens = ($max_tokens | default 64)
-#     let prompt = $"($shell)
-# # ($input), in one line: 
-# $ "
+    let max_tokens = ($max_tokens | default 200)
     let messages = [
-        {"role": "system", "content": "You are a command line analyzer. Write the command that best fits my request directly after the message."},
+        {"role": "system", "content": "You are a command line analyzer. Write the command that best fits my request in a \"Command\" markdown chapter then describe each parameter used in a \"Explanation\" markdown chapter."},
         {"role": "user", "content": $input}
-        {"role": "assistant", "content": "```"}
     ]
-    let result = (chat-completion "gpt-3.5-turbo" $messages --temperature 0 --top-p 1.0 --frequency-penalty 0.2 --presence-penalty 0 --max-tokens $max_tokens --stop ["```", "\n"]  )
-    let result = $result.choices.0.text
-    let result = (if $result =~ '^\s*#\s*' {
-        ($result | parse -r '^\s*#\s*(?<command>.+)$').0.command | str trim
-    } else {
-        $result | str trim
-    })
+    let result = (chat-completion "gpt-3.5-turbo" $messages --temperature 0 --top-p 1.0 --frequency-penalty 0.2 --presence-penalty 0 --max-tokens $max_tokens  )
+    # return $result
+    let result = $result.choices.0.message.content
+    md_to_console $result
+    
     if not $no_interactive {
-        print $"(ansi green)($result)(ansi reset)"
-        if (input "execute ? (y/n) ") == "y" {
+        print ""
+        if (input "Execute ? (y/n) ") == "y" {
             nu -c $"($result)"
         }
-    } else {
-        $result
     }
 }
 # Ask any question to the OpenAI model.
