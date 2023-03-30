@@ -41,6 +41,28 @@ export def models [
     })
     http get $"https://api.openai.com/v1/models($suffix)" -H ["Authorization" $"Bearer (get-api)"]
 }
+
+export-env {
+    let-env OPENAI_DATA = {}
+}
+
+export def-env "set previous_messages" [messages: list] {
+    let-env OPENAI_DATA = {
+        previous_messages: $messages
+    }
+}
+def-env "get previous_messages" [] {
+    if ($env | get -i OPENAI_DATA) != null {
+        if ($env.OPENAI_DATA | get -i previous_messages) != null {
+            $env.OPENAI_DATA.previous_messages
+        } else {
+            []
+        }
+    } else {
+        []
+    }
+}
+
 # Helper function to add a parameter to a record if it's not null.
 def add_param [name: string, value: any] {
     merge (if $value != null {
@@ -76,8 +98,7 @@ export def "api chat-completion" [
         | add_param "user" $user
     )
     let result = (http post "https://api.openai.com/v1/chat/completions" -H ["Authorization" $"Bearer (get-api)"] -t 'application/json' $params)
-    # print ($params | to json)
-    # let result = ""
+    
     $result
 }
 # Completion API call. 
@@ -120,7 +141,7 @@ export def "api completion" [
 }
 
 # Ask for a command to run. Will return one line command.
-export def command [
+export def-env command [
     input?: string      # The command to run. If not provided, will use the input from the pipeline
     --max-tokens: int   # The maximum number of tokens to generate, defaults to 64
     --no-interactive    # If true, will not ask to execute and will pipe the result 
@@ -130,15 +151,18 @@ export def command [
         error make {msg: "input is required"}
     }
     let max_tokens = ($max_tokens | default 200)
+    
     let messages = [
         {"role": "system", "content": "You are a command line analyzer. Write the command that best fits my request in a \"Command\" markdown chapter then describe each parameter used in a \"Explanation\" markdown chapter."},
         {"role": "user", "content": $input}
     ]
     let result = (api chat-completion "gpt-3.5-turbo" $messages --temperature 0 --top-p 1.0 --frequency-penalty 0.2 --presence-penalty 0 --max-tokens $max_tokens  )
     # return $result
+    set previous_messages ($messages | append [$result.choices.0.message])
+    
     let result = $result.choices.0.message.content
     utils md_to_console $result
-    
+
     if not $no_interactive {
         print ""
         if (input "Execute ? (y/n) ") == "y" {
@@ -146,10 +170,37 @@ export def command [
         }
     }
 }
+# Continue a chat with GPT-3.5
+export def-env chat [
+    input?: string
+    --reset                              # Reset the chat history
+    --model: string = "gpt-3.5-turbo"       # The model to use, defaults to gpt-3.5-turbo
+    --max-tokens: int                       # The maximum number of tokens to generate, defaults to 150
+] {
+    let input = ($in | default $input)
+    if $reset {
+        set previous_messages []
+        return
+    }
+    if $input == null {
+        error make {msg: "input is required"}
+    }
+    
+    let messages = (get previous_messages | append [
+        {"role": "system", "content": "You are ChatGPT, a powerful conversational chatbot. Answer to me in informative way unless I tell you otherwise. You can format your message in markdown."},
+        {"role": "user", "content": $input}
+    ])
+    let result = (api chat-completion $model $messages --temperature 0 --top-p 1.0 --frequency-penalty 0.2 --presence-penalty 0 --max-tokens 300)
+    # return $result
+    set previous_messages ($messages | append [$result.choices.0.message])
+    
+    let result = $result.choices.0.message.content
+    utils md_to_console $result
+}
 # Ask any question to the OpenAI model.
 export def ask [
     input?: string                          # The question to ask. If not provided, will use the input from the pipeline
-    --model: string = "gpt-3.5-turbo"    # The model to use, defaults to text-davinci-003
+    --model: string = "gpt-3.5-turbo"    # The model to use, defaults to gpt-3.5-turbo
     --max-tokens: int                       # The maximum number of tokens to generate, defaults to 150
 ] {
     let input = ($in | default $input)
