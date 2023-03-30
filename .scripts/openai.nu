@@ -161,7 +161,7 @@ export def-env command [
     set previous_messages ($messages | append [$result.choices.0.message])
     
     let result = $result.choices.0.message.content
-    utils md_to_console $result
+    $result | utils display markdown 
 
     if not $no_interactive {
         print ""
@@ -195,7 +195,7 @@ export def-env chat [
     set previous_messages ($messages | append [$result.choices.0.message])
     
     let result = $result.choices.0.message.content
-    utils md_to_console $result
+    $result | utils display markdown
 }
 # Ask any question to the OpenAI model.
 export def ask [

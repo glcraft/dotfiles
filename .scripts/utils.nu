@@ -107,10 +107,10 @@ def md_add_modifier [
 }
 
 export def "display markdown" [
-    input: string
     --no-bat(-b)
     --force-nu
 ] {
+    let input = $in
     mut markdown = $input
     mut code_lang = ""
     mut code = []
