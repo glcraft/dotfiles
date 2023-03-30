@@ -21,6 +21,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
 # SOFTWARE.
 
+use utils.nu
+
 def get-api [] {
     if not "OPENAI_API_KEY" in $env {
         error make {msg: "OPENAI_API_KEY not set"}
@@ -116,49 +118,7 @@ export def "api completion" [
     let result = (http post "https://api.openai.com/v1/completions" -H ["Authorization" $"Bearer (get-api)"] -t 'application/json' $params)
     $result
 }
-def md_title [title: string] {
-    let size = ((term size | get columns) / 2) - 4
-    let title_length = ($title | str length)
-    let left = (($size / 2) - $title_length / 2)
-    let right = ($size - $left - $title_length)
-    let line = (char -u "2500")
-    let line_stop_left = (char -u "2574")
-    let line_stop_right = (char -u "2576")
-    print $"\n(1..$left | each {|| $line } | str join)($line_stop_left)(ansi -e { fg: '#000000' bg: '#ffffff' attr: b }) ($title) (ansi reset)($line_stop_right)(1..$right | each {|| $line } | str join)\n"
-}
-def md_to_console [md: string] {
-    mut is_code = false
-    for $line in ($md | lines) {
-        if ($line =~ "^\\s*```") {
-            $is_code = (not $is_code)
-            continue
-        } 
-        if $is_code {
-            $line | nu-highlight | print
-            continue
-        }
-        mut index = 0
-        if ($line =~ '^\s*#+\s+') {
-            let name = ($line | parse -r '^\s*#+\s+(?<name>.*)$' | get 0.name)
-            # print $"\n(ansi -e { fg: '#000000' bg: '#ffffff' attr: b }) ($name) (ansi reset)\n"
-            md_title $name
-            continue
-        } else if ($line =~ '^\s*-\s+') {
-            print -n $"(char prompt) "
-            $index = ($line | parse -r '^(\s*-\s+)' | get 0.capture0 | str length)
-        }
-        mut is_inline_code = false
-        for $char in ($line | split chars | skip $index) {
-            if $char == '`' {
-                print -n (if not $is_inline_code {ansi yellow} else {ansi reset})
-                $is_inline_code = (not $is_inline_code)
-            } else {
-                print -n $char
-            }
-        }
-        print (ansi reset)
-    }
-}
+
 # Ask for a command to run. Will return one line command.
 export def command [
     input?: string      # The command to run. If not provided, will use the input from the pipeline
@@ -177,7 +137,7 @@ export def command [
     let result = (api chat-completion "gpt-3.5-turbo" $messages --temperature 0 --top-p 1.0 --frequency-penalty 0.2 --presence-penalty 0 --max-tokens $max_tokens  )
     # return $result
     let result = $result.choices.0.message.content
-    md_to_console $result
+    utils md_to_console $result
     
     if not $no_interactive {
         print ""
