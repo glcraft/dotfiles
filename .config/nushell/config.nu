@@ -251,10 +251,10 @@ let xrepo_completer = {|spans|
 
 let external_completer = {|spans| 
   {
-    spans.0: if $has_carapace { $carapace_completer } else { {|spans|{}} }
+    $spans.0: (if $has_carapace { $carapace_completer } else { {|spans| { } } })
     xmake: $xmake_completer
     xrepo: $xrepo_completer
-  } | get $spans.0 | each {|it| do $it $spans}
+  } | get ($spans.0) | each {|it| do $it $spans}
 }
 
 
