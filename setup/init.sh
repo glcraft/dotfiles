@@ -100,6 +100,32 @@ elif $ISLINUX; then
 fi
 INSTALL_PKG="sudo $INSTALL_PKG -y"
 
+#install zsh
+if [ "$(which zsh)" -eq "" ]; then
+    echo "Installing zsh..."
+    $INSTALL_PKG zsh
+fi
+
+# install base-devel on linux
+if [ $ISLINUX -eq 1 ]
+    if [ "$(which pacman)" -ne "" ]; then
+        echo "Installing base-devel..."
+        $INSTALL_PKG base-devel
+    elif [ "$(which apt)" -ne "" ] || [ "$(which apt-get)" != "" ]; then
+        echo "Installing build-essential..."
+        $INSTALL_PKG build-essential
+    elif [ "$(which yum)" -ne "" ] || [ "$(which dnf)" -ne "" ]; then
+        echo "Installing groupinstall development tools..."
+        $INSTALL_PKG groupinstall development tools
+    fi
+fi
+
+# install rust
+if [ "$(which rustup)" -eq "" ]; then
+    echo "Installing rust..."
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s - -y
+fi
+
 # install git
 if [ "$(which git)" -eq "" ]; then
     echo "Installing git..."
