@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # quit if not in dotfile directory
 if [ ! -f "setup/init.sh" ]; then
     echo "Please run this script in the dotfile directory!"
