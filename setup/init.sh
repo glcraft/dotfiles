@@ -1,4 +1,8 @@
-#!/bin/bash
+# quit if not in dotfile directory
+if [ ! -f "setup/init.sh" ]; then
+    echo "Please run this script in the dotfile directory!"
+    exit 1
+fi
 
 # grant sudo permission
 if [ "$(whoami)" != "root" ]; then
