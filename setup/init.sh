@@ -13,7 +13,8 @@ if [ "$(whoami)" != "root" ]; then
 fi
 
 # Create a temporary directory to store the downloaded files
-mkdir -p /tmp/init
+[ "$(uname)" == "Darwin" ] && ISMACOS=1 || ISMACOS=0
+[ "$(uname)" == "Linux" ] && ISLINUX=1 || ISLINUX=0
 
 #function to quit the script if any command fails
 function quit_if_failed {
@@ -37,7 +38,7 @@ function install_brew {
     fi
     echo "Installing brew..."
     bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    if [ "$(uname)" == "Linux" ]; then
+    if [ $ISLINUX -eq 1 ]; then
         echo '# Set PATH, MANPATH, etc., for Homebrew.' >> $HOME/.profile
         echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> $HOME/.profile
         eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
@@ -55,8 +56,8 @@ if [ "$(uname)" == "Darwin" ]; then
     INSTALL_PKG="$PKG_MGR install"
     echo "Updating brew..."
     $INSTALL_PKG update && $INSTALL_PKG upgrade || quit_if_failed "brew update && brew upgrade"
-elif [ "$(uname)" == "Linux" ]; then
-    if [ "$(which apt)" != "" ]; then
+# On Linux...
+elif $ISLINUX; then
         echo "Using apt as package manager..."
         PKG_MGR="apt"
         INSTALL_PKG="sudo $PKG_MGR install"
@@ -106,7 +107,7 @@ if [ "$(which git)" == "" ]; then
 fi
 
 # install paru on arch linux
-if [ "$(uname)" == "Linux" ] && [ "$(which pacman)" != "" ] && [ "$(which paru)" == "" ]; then
+if [ $ISLINUX -eq 1 ] && [ "$(which pacman)" -ne "" ] && [ "$(which paru)" -eq "" ]; then
     echo "Installing paru..."
     git clone https://aur.archlinux.org/paru.git /tmp/init/paru
     pushd /tmp/init/paru
