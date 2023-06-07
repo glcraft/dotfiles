@@ -31,8 +31,12 @@ function download {
     fi
 }
 
-function install_brew {
-    if [ "$(which curl)" == "" ]; then
+# Select a package manager
+# On MacOS...
+if [ $ISMACOS -eq 1 ]; then
+    # On macOS, install brew if it's not already installed
+    if [ "$(which brew)" -eq "" ]; then
+        if [ "$(which curl)" -eq "" ]; then
         echo "Installing curl..."
         $INSTALL_PKG curl
     fi
@@ -43,13 +47,6 @@ function install_brew {
         echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> $HOME/.profile
         eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
     fi
-}
-
-# select a package manager
-if [ "$(uname)" == "Darwin" ]; then
-    # On macOS, install brew if it's not already installed
-    if [ "$(which brew)" == "" ]; then
-        install_brew
     fi
     echo "Using brew as package manager..."
     PKG_MGR="brew"
@@ -122,12 +119,8 @@ if [ "$(which paru)" != "" ]; then
 fi
 
 # download and install nu shell
-if [ "$(which nu)" == "" ]; then
-    # install brew for linux if needed
-    if [ "$(which pacman)" == "" ] && [ "$(which brew)" == "" ]; then
-        install_brew
-    fi
-    echo "Installing nu shell..."
+if [ "$(which nu)" -eq "" ]; then
+    echo -n "Installing nu shell... "
     INSTALL=KO
     if [ "$(which pacman)" != "" ]; then
         sudo pacman -S nushell && INSTALL=OK
