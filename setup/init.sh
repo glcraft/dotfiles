@@ -26,9 +26,9 @@ function quit_if_failed {
     fi
 }
 function download {
-    if [ "$(which wget)" != "" ]; then
+    if [ "$(which wget)" -ne "" ]; then
         wget -O - "$1"
-    elif [ "$(which curl)" != "" ]; then
+    elif [ "$(which curl)" -ne "" ]; then
         curl -fsSL "$1"
     fi
 }
@@ -57,6 +57,7 @@ if [ $ISMACOS -eq 1 ]; then
     $INSTALL_PKG update && $INSTALL_PKG upgrade || quit_if_failed "brew update && brew upgrade"
 # On Linux...
 elif $ISLINUX; then
+    if [ "$(which apt)" -ne "" ]; then
         echo "Using apt as package manager..."
         PKG_MGR="apt"
         INSTALL_PKG="sudo $PKG_MGR install"
@@ -68,25 +69,25 @@ elif $ISLINUX; then
         INSTALL_PKG="sudo $PKG_MGR install"
         echo "Updating apt-get..."
         sudo $PKG_MGR update && sudo $PKG_MGR upgrade || quit_if_failed "apt-get update && apt-get upgrade"
-    elif [ "$(which yum)" != "" ]; then
+    elif [ "$(which yum)" -ne "" ]; then
         echo "Using yum as package manager..."
         PKG_MGR="yum"
         INSTALL_PKG="sudo $PKG_MGR install"
         echo "Updating yum..."
         sudo $PKG_MGR update && sudo $PKG_MGR upgrade || quit_if_failed "yum update && yum upgrade"
-    elif [ "$(which dnf)" != "" ]; then
+    elif [ "$(which dnf)" -ne "" ]; then
         echo "Using dnf as package manager..."
         PKG_MGR="dnf"
         INSTALL_PKG="sudo $PKG_MGR install"
         echo "Updating dnf..."
         sudo $PKG_MGR update && sudo $PKG_MGR upgrade || quit_if_failed "dnf update && dnf upgrade"
-    elif [ "$(which pacman)" != "" ]; then
+    elif [ "$(which pacman)" -ne "" ]; then
         echo "Using pacman as package manager..."
         PKG_MGR="pacman"
         INSTALL_PKG="sudo $PKG_MGR -S"
         echo "Updating pacman..."
         sudo $PKG_MGR -Syu
-    elif [ "$(which brew)" != "" ]; then
+    elif [ "$(which brew)" -ne "" ]; then
         echo "Using brew as package manager..."
         PKG_MGR="brew"
         INSTALL_PKG="$PKG_MGR install"
@@ -100,7 +101,7 @@ fi
 INSTALL_PKG="sudo $INSTALL_PKG -y"
 
 # install git
-if [ "$(which git)" == "" ]; then
+if [ "$(which git)" -eq "" ]; then
     echo "Installing git..."
     $INSTALL_PKG git
 fi
@@ -113,8 +114,9 @@ if [ $ISLINUX -eq 1 ] && [ "$(which pacman)" -ne "" ] && [ "$(which paru)" -eq "
     makepkg -si
     popd
 fi
+
 # use paru as package manager 
-if [ "$(which paru)" != "" ]; then
+if [ "$(which paru)" -ne "" ]; then
     echo "Using paru as package manager instead..."
     PKG_MGR="paru"
     INSTALL_PKG="sudo $PKG_MGR -S"
@@ -124,13 +126,8 @@ fi
 if [ "$(which nu)" -eq "" ]; then
     echo -n "Installing nu shell... "
     INSTALL=KO
-    if [ "$(which pacman)" != "" ]; then
+    if [ "$(which pacman)" -ne "" ]; then
         sudo pacman -S nushell && INSTALL=OK
-    elif [ "$(which brew)" != "" ]; then
-        brew install nushell && INSTALL=OK
-    fi
-    if [ $INSTALL != OK ]; then
-        echo "Unable to install nushell. Skip..."
     else
         # ask for setting nu as default shell
         echo "Do you want to set nu as your default shell? [y/N]"
@@ -154,14 +151,14 @@ echo "- none            [0]"
 read -r PROMPT
 case $PROMPT in
     1|*)
-        if [ "$(which starship)" == "" ]; then
+        if [ "$(which starship)" -eq "" ]; then
             echo "Installing starship prompt..."
-            if [ "$(which pacman)" != "" ] || [ "$(which paru)" != "" ]; then
+            if [ "$(which pacman)" -ne "" ] || [ "$(which paru)" -ne "" ]; then
                 $INSTALL_PKG starship
-            elif [ "$(which dnf)" != "" ]; then
+            elif [ "$(which dnf)" -ne "" ]; then
                 dnf copr enable atim/starship
                 dnf install starship
-            elif [ "$(which brew)" != "" ]; then
+            elif [ "$(which brew)" -ne "" ]; then
                 $INSTALL_PKG starship
             else
                 echo "Installing starship prompt from starship.rs/install.sh..."
