@@ -13,6 +13,8 @@ if [ "$(whoami)" != "root" ]; then
 fi
 
 # Create a temporary directory to store the downloaded files
+TMPDIR=$(mktemp -d)
+
 [ "$(uname)" == "Darwin" ] && ISMACOS=1 || ISMACOS=0
 [ "$(uname)" == "Linux" ] && ISLINUX=1 || ISLINUX=0
 
@@ -106,8 +108,8 @@ fi
 # install paru on arch linux
 if [ $ISLINUX -eq 1 ] && [ "$(which pacman)" -ne "" ] && [ "$(which paru)" -eq "" ]; then
     echo "Installing paru..."
-    git clone https://aur.archlinux.org/paru.git /tmp/init/paru
-    pushd /tmp/init/paru
+    git clone https://aur.archlinux.org/paru.git "$TMPDIR/paru"
+    pushd $TMPDIR/paru
     makepkg -si
     popd
 fi
@@ -197,6 +199,3 @@ EOF >> ~/.zshrc
         echo "Skipping prompt installation..."
         ;;
 esac
-
-# remove temporary directory
-rm -rf /tmp/init
