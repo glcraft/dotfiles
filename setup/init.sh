@@ -129,12 +129,16 @@ if [ "$(which nu)" -eq "" ]; then
     if [ "$(which pacman)" -ne "" ]; then
         sudo pacman -S nushell && INSTALL=OK
     else
+        cargo install nu && INSTALL=OK
+    fi
+    echo $INSTALL
+    if [ $INSTALL -eq OK ]; then
         # ask for setting nu as default shell
         echo "Do you want to set nu as your default shell? [y/N]"
         read -r SET_NU_AS_DEFAULT
         if [ "$SET_NU_AS_DEFAULT" == "y" ]; then
-            echo "Setting nu as default shell..."
-            sudo chsh -s "$(which nu)"
+            echo -n "Setting nu as default shell..."
+            sudo chsh -s "$(which nu)" && echo OK || echo KO
         fi
     fi
 fi
