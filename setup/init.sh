@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-$PROMPTER="starship"
+PROMPTER="starship"
 
 # parse arguments
 do 
@@ -8,10 +8,10 @@ do
     shift
     case $opt in
         -p|--powerline10k)
-            $PROMPTER="powerline10k"
+            PROMPTER="powerline10k"
             ;;
         -n|--no-prompter)
-            $PROMPTER="none"
+            PROMPTER="none"
             ;;
         -h|--help)
             echo "Usage: $0 [-p|--powerline10k] [-h|--help] [-n|--no-prompter]"
