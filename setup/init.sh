@@ -72,7 +72,7 @@ function check_package_and_install {
     #         ALREADY_INSTALLED=OK
     #     fi
     fi
-    if ! [ "$ALREADY_INSTALLED" == "KO" ]; then
+    if [ "$ALREADY_INSTALLED" == "KO" ]; then
         echo -n "Installing $1 using $PKG_MGR... "
         if $INSTALL_PKG $1; then
             echo "$(echo $RED)OK"
