@@ -172,7 +172,8 @@ fi
 
 # install dot files and folders
 echo "Installing dot files and folders..."
-cp -r .cache .cargo .config .zshrc  ~/
+find . -maxdepth 1 -path "./.*" -not -name ".git" -exec cp -r '{}' ~/ \;
+
 
 #ask for starship prompt or powerlevel10k
 echo "Which prompt do you want to install ?"
