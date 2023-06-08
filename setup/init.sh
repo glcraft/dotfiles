@@ -41,15 +41,17 @@ function check_program {
 
 # check if a program exists and install it if not
 function check_and_install {
-    if ! check_program $1; then
-        echo -n "Installing $1 using $PKG_MGR... "
-        if $INSTALL_PKG $1; then
-            echo "$(echo $RED)OK"
-        else 
-            echo "$(echo $GREEN)KO"
-            return 1
+    for prog in $@; do
+        if ! check_program $prog; then
+            echo -n "Installing $prog using $PKG_MGR... "
+            if $INSTALL_PKG $prog; then
+                echo "$(echo $RED)OK"
+            else
+                echo "$(echo $GREEN)KO"
+                return 1
+            fi
         fi
-    fi
+    done
     return 0
 }
 
@@ -269,3 +271,4 @@ EOF
         exit 1
         ;;
 esac
+
