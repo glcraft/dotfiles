@@ -43,18 +43,57 @@ function check_program {
 function check_and_install {
     if ! check_program $1; then
         echo -n "Installing $1 using $PKG_MGR... "
-        $INSTALL_PKG $1 && echo "$(echo $RED)OK" || echo "$(echo $GREEN)KO"
-    else
-        return 0
+        if $INSTALL_PKG $1; then
+            echo "$(echo $RED)OK"
+        else 
+            echo "$(echo $GREEN)KO"
+            return 1
+        fi
     fi
+    return 0
+}
+
+function check_package_and_install {
+    ALREADY_INSTALLED=KO
+    if [ "$PKG_MGR" = "pacman" ]; then
+        if pacman -Qs $1 > /dev/null ; then
+            ALREADY_INSTALLED=OK
+        fi
+    # elif [ "$PKG_MGR" = "apt" ]; then
+    #     if dpkg -s $1 > /dev/null ; then
+    #         ALREADY_INSTALLED=OK
+    #     fi
+    # elif [ "$PKG_MGR" = "dnf" ]; then
+    #     if dnf list installed $1 > /dev/null ; then
+    #         ALREADY_INSTALLED=OK
+    #     fi
+    # elif [ "$PKG_MGR" = "yum" ]; then
+    #     if yum list installed $1 > /dev/null ; then
+    #         ALREADY_INSTALLED=OK
+    #     fi
+    fi
+    if ! [ "$ALREADY_INSTALLED" == "KO" ]; then
+        echo -n "Installing $1 using $PKG_MGR... "
+        if $INSTALL_PKG $1; then
+            echo "$(echo $RED)OK"
+        else 
+            echo "$(echo $GREEN)KO"
+            return 1
+        fi
+    fi
+    return 0
 }
 function check_and_install_using {
-    if ! check_program $1; then
-        echo -n "Installing $1 using "$2"... "
-        $2 $1 && echo "$(echo $RED)OK" || echo "$(echo $GREEN)KO"
-    else
-        return 0
+    if ! check_program $2; then
+        echo -n "Installing $2 using "$1"... "
+        if $1 $2; then
+            echo "$(echo $RED)OK"
+        else 
+            echo "$(echo $GREEN)KO"
+            return 1
+        fi
     fi
+    return 0
 }
 
 # grant sudo permission
@@ -194,7 +233,7 @@ if check_program paru; then
 fi
 
 # download and install nu shell
-check_and_install nushell || check_and_install_using "cargo install" nu
+check_package_and_install nushell || check_and_install_using "cargo install" nu
 
 # install dot files and folders
 echo "Installing dot files and folders..."
