@@ -5,20 +5,19 @@ RED="\033[0;31m"
 GREEN="\033[0;32m"
 
 # parse arguments
-for opt in "$@"
-do
+while (( "$#" )); do
+    opt="$1"
     case $opt in
-        -p|--powerline10k)
-            PROMPTER="powerline10k"
-            ;;
-        -n|--no-prompter)
-            PROMPTER="none"
+        -p|--prompter)
+            PROMPTER="$2"
+            shift
             ;;
         -h|--help)
-            echo "Usage: $0 [-p|--powerline10k] [-h|--help] [-n|--no-prompter]"
-            echo "  -p|--powerline10k:  use powerline10k as prompter"
-            echo "  -n|--no-prompter:   do not use any prompter"
-            echo "  -h|--help:          show this help message"
+            echo "Usage: $0 [-p|--prompter <prompt>] [-n|--no-prompter] [-h|--help]"
+            echo "  -p|--prompter <prompt>:  use powerline10k as prompter"
+            echo "                           possible: powerline10k, starship, none"
+            echo "                           default: starship"
+            echo "  -h|--help:                show this help message"
             exit 0
             ;;
         *)
@@ -26,6 +25,7 @@ do
             exit 1
             ;;
     esac
+    shift
 done
 
 # quit if not in dotfile directory
