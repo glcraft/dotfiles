@@ -54,9 +54,9 @@ function quit_if_failed {
     fi
 }
 function download {
-    if [ "$(which wget)" -ne "" ]; then
+    if [ "$(which wget)" != "" ]; then
         wget -O - "$1"
-    elif [ "$(which curl)" -ne "" ]; then
+    elif [ "$(which curl)" != "" ]; then
         curl -fsSL "$1"
     fi
 }
@@ -65,8 +65,8 @@ function download {
 # On MacOS...
 if [ $ISMACOS -eq 1 ]; then
     # On macOS, install brew if it's not already installed
-    if [ "$(which brew)" -eq "" ]; then
-        if [ "$(which curl)" -eq "" ]; then
+    if [ "$(which brew)" = "" ]; then
+        if [ "$(which curl)" = "" ]; then
         echo "Installing curl..."
         $INSTALL_PKG curl
     fi
@@ -85,7 +85,7 @@ if [ $ISMACOS -eq 1 ]; then
     $INSTALL_PKG update && $INSTALL_PKG upgrade || quit_if_failed "brew update && brew upgrade"
 # On Linux...
 elif $ISLINUX; then
-    if [ "$(which apt)" -ne "" ]; then
+    if [ "$(which apt)" != "" ]; then
         echo "Using apt as package manager..."
         PKG_MGR="apt"
         INSTALL_PKG="sudo $PKG_MGR install -y"
@@ -97,25 +97,25 @@ elif $ISLINUX; then
         INSTALL_PKG="sudo $PKG_MGR install -y"
         echo "Updating apt-get..."
         sudo $PKG_MGR update && sudo $PKG_MGR upgrade || quit_if_failed "apt-get update && apt-get upgrade"
-    elif [ "$(which yum)" -ne "" ]; then
+    elif [ "$(which yum)" != "" ]; then
         echo "Using yum as package manager..."
         PKG_MGR="yum"
         INSTALL_PKG="sudo $PKG_MGR install -y"
         echo "Updating yum..."
         sudo $PKG_MGR update && sudo $PKG_MGR upgrade || quit_if_failed "yum update && yum upgrade"
-    elif [ "$(which dnf)" -ne "" ]; then
+    elif [ "$(which dnf)" != "" ]; then
         echo "Using dnf as package manager..."
         PKG_MGR="dnf"
         INSTALL_PKG="sudo $PKG_MGR install -y"
         echo "Updating dnf..."
         sudo $PKG_MGR update && sudo $PKG_MGR upgrade || quit_if_failed "dnf update && dnf upgrade"
-    elif [ "$(which pacman)" -ne "" ]; then
+    elif [ "$(which pacman)" != "" ]; then
         echo "Using pacman as package manager..."
         PKG_MGR="pacman"
         INSTALL_PKG="sudo $PKG_MGR -S --noconfirm"
         echo "Updating pacman..."
         sudo $PKG_MGR -Syu --noconfirm || quit_if_failed "pacman -Syu --noconfirm"
-    elif [ "$(which brew)" -ne "" ]; then
+    elif [ "$(which brew)" != "" ]; then
         echo "Using brew as package manager..."
         PKG_MGR="brew"
         INSTALL_PKG="$PKG_MGR install"
@@ -128,39 +128,39 @@ elif $ISLINUX; then
 fi
 
 #install zsh
-if [ "$(which zsh)" -eq "" ]; then
+if [ "$(which zsh)" = "" ]; then
     echo "Installing zsh..."
     $INSTALL_PKG zsh
 fi
 
 # install base-devel on linux
 if [ $ISLINUX -eq 1 ]
-    if [ "$(which pacman)" -ne "" ]; then
+    if [ "$(which pacman)" != "" ]; then
         echo "Installing base-devel..."
         $INSTALL_PKG base-devel
-    elif [ "$(which apt)" -ne "" ] || [ "$(which apt-get)" != "" ]; then
+    elif [ "$(which apt)" != "" ] || [ "$(which apt-get)" != "" ]; then
         echo "Installing build-essential..."
         $INSTALL_PKG build-essential
-    elif [ "$(which yum)" -ne "" ] || [ "$(which dnf)" -ne "" ]; then
+    elif [ "$(which yum)" != "" ] || [ "$(which dnf)" != "" ]; then
         echo "Installing groupinstall development tools..."
         $INSTALL_PKG groupinstall development tools
     fi
 fi
 
 # install rust
-if [ "$(which rustup)" -eq "" ]; then
+if [ "$(which rustup)" = "" ]; then
     echo "Installing rust..."
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s - -y
 fi
 
 # install git if not already installed
-if [ "$(which git)" -eq "" ]; then
+if [ "$(which git)" = "" ]; then
     echo "Installing git..."
     $INSTALL_PKG git
 fi
 
 # install paru on arch linux
-if [ $ISLINUX -eq 1 ] && [ "$(which pacman)" -ne "" ] && [ "$(which paru)" -eq "" ]; then
+if [ $ISLINUX -eq 1 ] && [ "$(which pacman)" != "" ] && [ "$(which paru)" = "" ]; then
     echo "Installing paru..."
     git clone https://aur.archlinux.org/paru.git "$TMPDIR/paru"
     pushd $TMPDIR/paru
@@ -169,17 +169,17 @@ if [ $ISLINUX -eq 1 ] && [ "$(which pacman)" -ne "" ] && [ "$(which paru)" -eq "
 fi
 
 # use paru as package manager 
-if [ "$(which paru)" -ne "" ]; then
+if [ "$(which paru)" != "" ]; then
     echo "Using paru as package manager instead..."
     PKG_MGR="paru"
     INSTALL_PKG="sudo $PKG_MGR -S"
 fi
 
 # download and install nu shell
-if [ "$(which nu)" -eq "" ]; then
+if [ "$(which nu)" = "" ]; then
     echo -n "Installing nu shell... "
     INSTALL=KO
-    if [ "$(which pacman)" -ne "" ]; then
+    if [ "$(which pacman)" != "" ]; then
         sudo pacman -S nushell && INSTALL=OK
     else
         cargo install nu && INSTALL=OK
@@ -203,14 +203,14 @@ find . -maxdepth 1 -path "./.*" -not -name ".git" -exec cp -r '{}' ~/ \;
 
 case $PROMPTER in
     starship)
-        if [ "$(which starship)" -eq "" ]; then
+        if [ "$(which starship)" = "" ]; then
             echo "Installing starship prompt..."
-            if [ "$(which pacman)" -ne "" ] || [ "$(which paru)" -ne "" ]; then
+            if [ "$(which pacman)" != "" ] || [ "$(which paru)" != "" ]; then
                 $INSTALL_PKG starship
-            elif [ "$(which dnf)" -ne "" ]; then
+            elif [ "$(which dnf)" != "" ]; then
                 dnf copr enable atim/starship
                 dnf install starship
-            elif [ "$(which brew)" -ne "" ]; then
+            elif [ "$(which brew)" != "" ]; then
                 $INSTALL_PKG starship
             else
                 echo "Installing starship prompt from starship.rs/install.sh..."
