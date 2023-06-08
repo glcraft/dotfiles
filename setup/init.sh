@@ -1,5 +1,32 @@
 #!/usr/bin/env bash
 
+$PROMPTER="starship"
+
+# parse arguments
+do 
+    opt=$1
+    shift
+    case $opt in
+        -p|--powerline10k)
+            $PROMPTER="powerline10k"
+            ;;
+        -n|--no-prompter)
+            $PROMPTER="none"
+            ;;
+        -h|--help)
+            echo "Usage: $0 [-p|--powerline10k] [-h|--help] [-n|--no-prompter]"
+            echo "  -p|--powerline10k:  use powerline10k as prompter"
+            echo "  -n|--no-prompter:   do not use any prompter"
+            echo "  -h|--help:          show this help message"
+            exit 0
+            ;;
+        *)
+            echo "Invalid option: $opt"
+            exit 1
+            ;;
+    esac
+done
+
 # quit if not in dotfile directory
 if [ ! -f "setup/init.sh" ]; then
     echo "Please run this script in the dotfile directory!"
@@ -127,7 +154,7 @@ if [ "$(which rustup)" -eq "" ]; then
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s - -y
 fi
 
-# install git
+# install git if not already installed
 if [ "$(which git)" -eq "" ]; then
     echo "Installing git..."
     $INSTALL_PKG git
@@ -175,14 +202,8 @@ echo "Installing dot files and folders..."
 find . -maxdepth 1 -path "./.*" -not -name ".git" -exec cp -r '{}' ~/ \;
 
 
-#ask for starship prompt or powerlevel10k
-echo "Which prompt do you want to install ?"
-echo "- starship        [1, default]"
-echo "- powerlevel10k   [2]"
-echo "- none            [0]"
-read -r PROMPT
-case $PROMPT in
-    1|*)
+case $PROMPTER in
+    starship)
         if [ "$(which starship)" -eq "" ]; then
             echo "Installing starship prompt..."
             if [ "$(which pacman)" -ne "" ] || [ "$(which paru)" -ne "" ]; then
@@ -196,11 +217,9 @@ case $PROMPT in
                 echo "Installing starship prompt from starship.rs/install.sh..."
                 download https://starship.rs/install.sh | sh
             fi
-        else
-            echo "Starship prompt already installed!"
         fi
         ;;
-    2)
+    powerlevel10k)
         echo "Installing zimfw..."
         download https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh
         echo "Installing powerlevel10k..."
@@ -209,12 +228,16 @@ case $PROMPT in
 zmodule romkatv/powerlevel10k --use degit
 EOF >> ~/.zimrc
         zimfw install
-                cat <<EOF
+        cat <<EOF
 # To customize prompt, run `p10k configure` or edit ~/.config/.p10k.zsh.
 [[ ! -f ~/.config/.p10k.zsh ]] || source ~/.config/.p10k.zsh
 EOF >> ~/.zshrc
         ;;
-    0)
+    none)
         echo "Skipping prompt installation..."
+        ;;
+    *)
+        echo "Unknown prompter $PROMPTER!"
+        exit 1
         ;;
 esac
