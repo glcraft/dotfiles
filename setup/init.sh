@@ -84,7 +84,7 @@ if [ $ISMACOS -eq 1 ]; then
     echo "Updating brew..."
     $INSTALL_PKG update && $INSTALL_PKG upgrade || quit_if_failed "brew update && brew upgrade"
 # On Linux...
-elif $ISLINUX; then
+elif [ $ISLINUX -eq 1 ]; then
     if [ "$(which apt)" != "" ]; then
         echo "Using apt as package manager..."
         PKG_MGR="apt"
@@ -134,7 +134,7 @@ if [ "$(which zsh)" = "" ]; then
 fi
 
 # install base-devel on linux
-if [ $ISLINUX -eq 1 ]
+if [ $ISLINUX -eq 1 ]; then
     if [ "$(which pacman)" != "" ]; then
         echo "Installing base-devel..."
         $INSTALL_PKG base-devel
