@@ -172,7 +172,7 @@ fi
 if [ "$(which paru)" != "" ]; then
     echo "Using paru as package manager instead..."
     PKG_MGR="paru"
-    INSTALL_PKG="sudo $PKG_MGR -S"
+    INSTALL_PKG="sudo $PKG_MGR -S --noconfirm"
 fi
 
 # download and install nu shell
@@ -180,16 +180,16 @@ if [ "$(which nu)" = "" ]; then
     echo -n "Installing nu shell... "
     INSTALL=KO
     if [ "$(which pacman)" != "" ]; then
-        sudo pacman -S nushell && INSTALL=OK
+        $INSTALL_PKG nushell && INSTALL=OK
     else
         cargo install nu && INSTALL=OK
     fi
     echo $INSTALL
-    if [ $INSTALL -eq OK ]; then
+    if [ "$INSTALL" = "OK" ]; then
         # ask for setting nu as default shell
         echo "Do you want to set nu as your default shell? [y/N]"
         read -r SET_NU_AS_DEFAULT
-        if [ "$SET_NU_AS_DEFAULT" == "y" ]; then
+        if [ "$SET_NU_AS_DEFAULT" = "y" ]; then
             echo -n "Setting nu as default shell..."
             sudo chsh -s "$(which nu)" && echo OK || echo KO
         fi
@@ -222,15 +222,15 @@ case $PROMPTER in
         echo "Installing zimfw..."
         download https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh
         echo "Installing powerlevel10k..."
-        cat << EOF
+        cat << EOF >> ~/.zimrc
 # Use powerlevel10k theme
 zmodule romkatv/powerlevel10k --use degit
-EOF >> ~/.zimrc
+EOF 
         zimfw install
-        cat <<EOF
+        cat << EOF >> ~/.zshrc
 # To customize prompt, run `p10k configure` or edit ~/.config/.p10k.zsh.
 [[ ! -f ~/.config/.p10k.zsh ]] || source ~/.config/.p10k.zsh
-EOF >> ~/.zshrc
+EOF
         ;;
     none)
         echo "Skipping prompt installation..."
