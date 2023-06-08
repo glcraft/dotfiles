@@ -62,33 +62,33 @@ elif $ISLINUX; then
     if [ "$(which apt)" -ne "" ]; then
         echo "Using apt as package manager..."
         PKG_MGR="apt"
-        INSTALL_PKG="sudo $PKG_MGR install"
+        INSTALL_PKG="sudo $PKG_MGR install -y"
         echo "Updating apt..."
         sudo $PKG_MGR update && sudo $PKG_MGR upgrade -y || quit_if_failed "apt update && apt upgrade"
     elif [ "$(which apt-get)" != "" ]; then
         echo "Using apt-get as package manager..."
         PKG_MGR="apt-get"
-        INSTALL_PKG="sudo $PKG_MGR install"
+        INSTALL_PKG="sudo $PKG_MGR install -y"
         echo "Updating apt-get..."
         sudo $PKG_MGR update && sudo $PKG_MGR upgrade || quit_if_failed "apt-get update && apt-get upgrade"
     elif [ "$(which yum)" -ne "" ]; then
         echo "Using yum as package manager..."
         PKG_MGR="yum"
-        INSTALL_PKG="sudo $PKG_MGR install"
+        INSTALL_PKG="sudo $PKG_MGR install -y"
         echo "Updating yum..."
         sudo $PKG_MGR update && sudo $PKG_MGR upgrade || quit_if_failed "yum update && yum upgrade"
     elif [ "$(which dnf)" -ne "" ]; then
         echo "Using dnf as package manager..."
         PKG_MGR="dnf"
-        INSTALL_PKG="sudo $PKG_MGR install"
+        INSTALL_PKG="sudo $PKG_MGR install -y"
         echo "Updating dnf..."
         sudo $PKG_MGR update && sudo $PKG_MGR upgrade || quit_if_failed "dnf update && dnf upgrade"
     elif [ "$(which pacman)" -ne "" ]; then
         echo "Using pacman as package manager..."
         PKG_MGR="pacman"
-        INSTALL_PKG="sudo $PKG_MGR -S"
+        INSTALL_PKG="sudo $PKG_MGR -S --noconfirm"
         echo "Updating pacman..."
-        sudo $PKG_MGR -Syu
+        sudo $PKG_MGR -Syu --noconfirm || quit_if_failed "pacman -Syu --noconfirm"
     elif [ "$(which brew)" -ne "" ]; then
         echo "Using brew as package manager..."
         PKG_MGR="brew"
@@ -100,7 +100,6 @@ elif $ISLINUX; then
         exit 1
     fi
 fi
-INSTALL_PKG="sudo $INSTALL_PKG -y"
 
 #install zsh
 if [ "$(which zsh)" -eq "" ]; then
