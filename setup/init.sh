@@ -191,7 +191,7 @@ fi
 check_and_install zsh
 
 # install base-devel on linux
-if [ $ISLINUX -eq 1 ] && check_program gcc; then
+if [ $ISLINUX -eq 1 ] && ! check_program gcc; then
     if check_program pacman; then
         echo "Installing base-devel..."
         $INSTALL_PKG base-devel
