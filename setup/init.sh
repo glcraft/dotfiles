@@ -218,6 +218,7 @@ fi
 
 # install paru on arch linux
 if [ $ISLINUX -eq 1 ] && check_program pacman && ! check_program paru; then
+    check_and_install pkg-config
     echo "Installing paru..."
     git clone https://aur.archlinux.org/paru.git "$TMPDIR/paru"
     pushd $TMPDIR/paru
