@@ -3,9 +3,8 @@
 PROMPTER="starship"
 
 # parse arguments
-do 
-    opt=$1
-    shift
+for opt in "$@"
+do
     case $opt in
         -p|--powerline10k)
             PROMPTER="powerline10k"
