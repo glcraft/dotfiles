@@ -53,7 +53,7 @@ function check_and_install {
             echo -n "Installing $prog using $PKG_MGR... "
             if $INSTALL_PKG $prog; then
                 echo "\033[0;32mOK\033[0m"
-            else
+            else 
                 echo "$\033[0;31mKO\033[0m"
                 return 1
             fi
@@ -64,8 +64,8 @@ function check_and_install {
 
 function check_package_and_install {
     ALREADY_INSTALLED=KO
-    if [ "$PKG_MGR" = "pacman" ]; then
-        if pacman -Qs $1 > /dev/null ; then
+    if [ "$PKG_MGR" = "pacman" ] || [ "$PKG_MGR" = "paru" ]; then
+        if pacman -Qs $1 >/dev/null 2>&1 ; then
             ALREADY_INSTALLED=OK
         fi
     # elif [ "$PKG_MGR" = "apt" ]; then
