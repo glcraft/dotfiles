@@ -52,9 +52,9 @@ function check_and_install {
         if ! check_program $prog; then
             echo -n "Installing $prog using $PKG_MGR... "
             if $INSTALL_PKG $prog; then
-                echo "$(echo $RED)OK"
+                echo "\033[0;32mOK\033[0m"
             else
-                echo "$(echo $GREEN)KO"
+                echo "$\033[0;31mKO\033[0m"
                 return 1
             fi
         fi
@@ -81,12 +81,12 @@ function check_package_and_install {
     #         ALREADY_INSTALLED=OK
     #     fi
     fi
-    if [ "$ALREADY_INSTALLED" == "KO" ]; then
+    if [ "$ALREADY_INSTALLED" = "KO" ]; then
         echo -n "Installing $1 using $PKG_MGR... "
         if $INSTALL_PKG $1; then
-            echo "$(echo $RED)OK"
+            echo "\033[0;32mOK\033[0m"
         else 
-            echo "$(echo $GREEN)KO"
+            echo "$\033[0;31mKO\033[0m"
             return 1
         fi
     fi
@@ -96,9 +96,9 @@ function check_and_install_using {
     if ! check_program $2; then
         echo -n "Installing $2 using "$1"... "
         if $1 $2; then
-            echo "$(echo $RED)OK"
+            echo "\033[0;32mOK\033[0m"
         else 
-            echo "$(echo $GREEN)KO"
+            echo "$\033[0;31mKO\033[0m"
             return 1
         fi
     fi
