@@ -3,6 +3,7 @@
 PROMPTER="starship"
 RED="\033[0;31m"
 GREEN="\033[0;32m"
+GRAPHICAL=N
 
 # parse arguments
 while (( "$#" )); do
@@ -11,6 +12,9 @@ while (( "$#" )); do
         -p|--prompter)
             PROMPTER="$2"
             shift
+            ;;
+        --graphical)
+            GRAPHICAL=Y
             ;;
         -h|--help)
             echo "Usage: $0 [-p|--prompter <prompt>] [-n|--no-prompter] [-h|--help]"
@@ -272,3 +276,33 @@ EOF
         ;;
 esac
 
+# install bunch of useful tools
+if check_program pacman || check_program paru; then
+    $INSTALL_PKG bat just hyperfine fd the_silver_searcher lsd --needed
+
+elif check_program apt || check_program apt-get; then
+    $INSTALL_PKG bat fd-find the_silver_searcher --needed
+    cargo install lsd hyperfine
+    if check_program makedeb; then
+        git clone 'https://mpr.makedeb.org/just' "$TMPDIR/just"
+        pushd "$TMPDIR/just"
+        makedeb -si
+    else
+        cargo install just
+    fi
+    popd
+
+fi
+if ! check_program xmake; then
+    curl -fsSL https://xmake.io/shget.text | bash
+    xmake update -s dev
+fi
+
+# install graphical apps
+if [ "$GRAPHICAL" = Y ]; then
+    $INSTALL_PKG discord keepassxc --needed
+    # ...from the AUR
+    if [ "$PKG_MGR" = "paru" ]; then
+        paru --noconfirm -S microsoft-edge-stable-bin visual-studio-code-bin --needed
+    fi
+fi
