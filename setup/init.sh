@@ -17,11 +17,14 @@ while (( "$#" )); do
             GRAPHICAL=Y
             ;;
         -h|--help)
-            echo "Usage: $0 [-p|--prompter <prompt>] [-n|--no-prompter] [-h|--help]"
-            echo "  -p|--prompter <prompt>:  use powerline10k as prompter"
-            echo "                           possible: powerline10k, starship, none"
-            echo "                           default: starship"
-            echo "  -h|--help:                show this help message"
+            cat << EOF
+Usage: $(basename $0) [-p|--prompter <prompt>] [-n|--no-prompter] [-h|--help]
+    -p|--prompter <prompt>      use powerline10k as prompter
+                                possible: powerline10k, starship, none
+                                default: starship
+    --graphical                 install graphical apps (default: no)
+    -h|--help                   show this help message"
+EOF
             exit 0
             ;;
         *)
