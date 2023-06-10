@@ -254,6 +254,7 @@ case $PROMPTER in
         if ! check_and_install starship; then
             echo -n "Installing starship prompt from starship.rs/install.sh... "
             (download https://starship.rs/install.sh | sh) && echo "$(echo $RED)OK" || echo "$(echo $GREEN)KO"
+            starship init nu > ~/.cache/starship/init.nu
         fi
         ;;
     powerlevel10k)
