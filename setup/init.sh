@@ -281,7 +281,16 @@ esac
 
 # install bunch of useful tools
 if check_program pacman || check_program paru; then
-    $INSTALL_PKG bat just hyperfine fd the_silver_searcher lsd --needed
+    $INSTALL_PKG bat just hyperfine fd the_silver_searcher lsd  --needed
+
+    if [ "$PKG_MGR" = "paru" ]; then
+        paru --noconfirm -S carapace-bin atuin-bin --needed
+    else
+        $INSTALL_PKG atuin --needed
+    fi
+    if check_program atuin; then
+        [ ! -f ~/.cache/atuin/init.nu ] && atuin init nu > ~/.cache/atuin/init.nu
+    fi
 
 elif check_program apt || check_program apt-get; then
     $INSTALL_PKG bat fd-find the_silver_searcher --needed
