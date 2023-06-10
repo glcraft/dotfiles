@@ -546,6 +546,10 @@ let-env config = {
 # init starship
 source ~/.cache/starship/init.nu
 
+# init atuin
+if (not (which atuin | is-empty)) and ("~/.cache/atuin/init.nu" | path exists) {
+  source ~/.cache/atuin/init.nu
+}
 
 def-env pwd [] {
     $env.PWD
