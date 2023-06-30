@@ -245,8 +245,8 @@ let carapace_completer = {|spans|
   carapace $spans.0 nushell $spans | from json
 }
 let external_completer = {|spans| 
-  {
-    $spans.0: $carapace_completer
+  {$spans.0: $carapace_completer}
+  | merge {
     xmake: $xmake_completer
     xrepo: $xrepo_completer
   } | get $spans.0 | each {|it| do $it $spans}
