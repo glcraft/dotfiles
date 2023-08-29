@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-PROMPTER="starship"
 RED="\033[0;31m"
 GREEN="\033[0;32m"
 GRAPHICAL=N
@@ -9,19 +8,12 @@ GRAPHICAL=N
 while (( "$#" )); do
     opt="$1"
     case $opt in
-        -p|--prompter)
-            PROMPTER="$2"
-            shift
-            ;;
         --graphical)
             GRAPHICAL=Y
             ;;
         -h|--help)
             cat << EOF
-Usage: $(basename $0) [-p|--prompter <prompt>] [-n|--no-prompter] [-h|--help]
-    -p|--prompter <prompt>      use powerline10k as prompter
-                                possible: powerline10k, starship, none
-                                default: starship
+Usage: $(basename $0) [--graphical] [-h|--help]
     --graphical                 install graphical apps (default: no)
     -h|--help                   show this help message"
 EOF
@@ -216,7 +208,7 @@ fi
 # install rust
 if ! check_program rustup; then
     echo "Installing rust..."
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s - -y
+    ($INSTALL_PKG rustup && rustup toolchain add stable)|| curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s - -y
 fi
 
 # install git if not already installed
@@ -249,63 +241,26 @@ check_package_and_install nushell || check_and_install_using "cargo install" nu
 echo "Installing dot files and folders..."
 find . -maxdepth 1 -path "./.*" -not -name ".git" -exec cp -r '{}' ~/ \;
 
-case $PROMPTER in
-    starship)
-        if ! check_and_install starship; then
-            echo -n "Installing starship prompt from starship.rs/install.sh... "
-            (download https://starship.rs/install.sh | sh) && echo "$(echo $RED)OK" || echo "$(echo $GREEN)KO"
-            starship init nu > ~/.cache/starship/init.nu
-        fi
-        ;;
-    powerlevel10k)
-        echo "Installing zimfw..."
-        download https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh
-        echo "Installing powerlevel10k..."
-        cat << EOF >> ~/.zimrc
-# Use powerlevel10k theme
-zmodule romkatv/powerlevel10k --use degit
-EOF 
-        zimfw install
-        cat << EOF >> ~/.zshrc
-# To customize prompt, run `p10k configure` or edit ~/.config/.p10k.zsh.
-[[ ! -f ~/.config/.p10k.zsh ]] || source ~/.config/.p10k.zsh
-EOF
-        ;;
-    none)
-        echo "Skipping prompt installation..."
-        ;;
-    *)
-        echo "Unknown prompter $PROMPTER!"
-        exit 1
-        ;;
-esac
+# install zimfw
+echo "Installing zimfw..."
+(download https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh && zimfw install) && echo "$(echo $RED)OK" || echo "$(echo $GREEN)KO"
+
+echo -n "Installing starship prompt from starship.rs/install.sh... "
+(download https://starship.rs/install.sh | sh) && echo "$(echo $RED)OK" || echo "$(echo $GREEN)KO"
 
 # install bunch of useful tools
-if check_program pacman || check_program paru; then
-    $INSTALL_PKG bat just hyperfine fd the_silver_searcher lsd  --needed
 
-    if [ "$PKG_MGR" = "paru" ]; then
-        paru --noconfirm -S carapace-bin atuin-bin --needed
-    else
-        $INSTALL_PKG atuin --needed
-    fi
-    if check_program atuin; then
-        [ ! -f ~/.cache/atuin/init.nu ] && atuin init nu > ~/.cache/atuin/init.nu
-    fi
+check_and_install bat || check_and_install_using "cargo install" bat # https://github.com/sharkdp/bat
+check_package_and_install tealdeer || check_and_install_using "cargo install" tealdeer # https://github.com/dbrgn/tealdeer
+check_package_and_install fd-find || check_and_install fd || check_and_install_using "cargo install" fd-find # https://github.com/sharkdp/fd
+check_package_and_install ripgrep || check_and_install_using "cargo install" ripgrep # https://github.com/BurntSushi/ripgrep
+check_and_install exa || check_and_install_using "cargo install" exa # https://github.com/ogham/exa
+check_and_install hyperfine || check_and_install_using "cargo install" hyperfine # https://github.com/sharkdp/hyperfine
+check_and_install just || check_and_install_using "cargo install" just # https://github.com/casey/just
+check_package_and_install the_silver_searcher # https://github.com/ggreer/the_silver_searcher
+check_and_install fzf # https://github.com/junegunn/fzf
+check_and_install which
 
-elif check_program apt || check_program apt-get; then
-    $INSTALL_PKG bat fd-find the_silver_searcher --needed
-    cargo install lsd hyperfine
-    if check_program makedeb; then
-        git clone 'https://mpr.makedeb.org/just' "$TMPDIR/just"
-        pushd "$TMPDIR/just"
-        makedeb -si
-    else
-        cargo install just
-    fi
-    popd
-
-fi
 if ! check_program xmake; then
     curl -fsSL https://xmake.io/shget.text | bash
     xmake update -s dev
