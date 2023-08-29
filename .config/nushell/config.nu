@@ -544,7 +544,7 @@ let-env config = {
 }
 
 # init starship
-source ~/.cache/starship/init.nu
+source ~/.config/starship/init.nu
 
 # init atuin
 if (not (which atuin | is-empty)) and ("~/.cache/atuin/init.nu" | path exists) {
