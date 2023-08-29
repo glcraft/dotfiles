@@ -142,6 +142,10 @@ else
 	[[ ! -f ~/.config/powerlevel10k/full.zsh ]] || source ~/.config/powerlevel10k/full.zsh
 fi
 
+alias ls=exa
+alias ll="exa -l"
+alias la="exa -la"
+
 which carapace >/dev/null 2>&1 && source <(carapace _carapace)
 
 which atuin >/dev/null 2>&1 && eval "$(atuin init zsh)"
