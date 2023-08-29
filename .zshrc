@@ -136,7 +136,11 @@ unset key
 # }}} End configuration added by Zim install
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+if [[ "$TERM" == "linux" ]]; then
+	[[ ! -f ~/.config/powerlevel10k/tty.zsh ]] || source ~/.config/powerlevel10k/tty.zsh
+else
+	[[ ! -f ~/.config/powerlevel10k/full.zsh ]] || source ~/.config/powerlevel10k/full.zsh
+fi
 
 which carapace >/dev/null 2>&1 && source <(carapace _carapace)
 
