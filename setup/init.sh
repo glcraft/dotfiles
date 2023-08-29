@@ -259,6 +259,7 @@ check_and_install hyperfine || check_and_install_using "cargo install" hyperfine
 check_and_install just || check_and_install_using "cargo install" just # https://github.com/casey/just
 check_package_and_install the_silver_searcher # https://github.com/ggreer/the_silver_searcher
 check_and_install fzf # https://github.com/junegunn/fzf
+check_package_and_install carapace-bin
 check_and_install which
 
 if ! check_program xmake; then
