@@ -40,7 +40,7 @@ fi
 
 # check if a program exists
 function check_program {
-    [ "$(which $1 2>/dev/null)" != "" ]
+    which $1 2>/dev/null 1>&2
 }
 
 # check if a program exists and install it if not
@@ -269,7 +269,7 @@ check_and_install which
 
 if ! check_program xmake; then
     curl -fsSL https://xmake.io/shget.text | bash
-    xmake update -s dev
+    [ -f ~/.xmake/profile ] && source ~/.xmake/profile && xmake update -s dev || ~/.local/bin/xmake update -s dev
 fi
 
 # install graphical apps
