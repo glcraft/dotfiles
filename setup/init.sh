@@ -33,6 +33,11 @@ if [ ! -f "setup/init.sh" ]; then
     exit 1
 fi
 
+if ! which which 1>/dev/null 2>&1; then
+    echo "Install the command 'which' first!"
+    exit 1
+fi
+
 # check if a program exists
 function check_program {
     [ "$(which $1 2>/dev/null)" != "" ]
