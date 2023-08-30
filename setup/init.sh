@@ -82,7 +82,7 @@ function check_package_and_install_no_root {
     if ! check_package $1; then
         echo -n "Installing $1 using $PKG_MGR without root... "
         INSTALL_NO_ROOT=`(echo "$ISNTALL_PKG" | sed "s/sudo //g")`
-        if $INSTALL_PKG $1; then
+        if $INSTALL_NO_ROOT $1; then
             echo "\033[0;32mOK\033[0m"
         else 
             echo "$\033[0;31mKO\033[0m"
