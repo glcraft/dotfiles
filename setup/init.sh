@@ -262,8 +262,11 @@ if ! check_program zimfw; then
     (download https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh && zimfw install) && echo "$(echo $RED)OK" || echo "$(echo $GREEN)KO"
 fi
 
-echo -n "Installing starship prompt from starship.rs/install.sh... "
-(download https://starship.rs/install.sh | sh) && echo "$(echo $RED)OK" || echo "$(echo $GREEN)KO"
+# install starship prompt
+if ! check_program starship; then
+    echo -n "Installing starship prompt from starship.rs/install.sh... "
+    (download https://starship.rs/install.sh | sh) && echo "$(echo $RED)OK" || echo "$(echo $GREEN)KO"
+fi
 
 # install bunch of useful tools
 
