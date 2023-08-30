@@ -59,11 +59,11 @@ function check_and_install {
     return 0
 }
 
-function check_package_and_install {
-    ALREADY_INSTALLED=KO
+function check_package {
+    ALREADY_INSTALLED=N
     if [ "$PKG_MGR" = "pacman" ] || [ "$PKG_MGR" = "paru" ]; then
         if pacman -Qs $1 >/dev/null 2>&1 ; then
-            ALREADY_INSTALLED=OK
+            ALREADY_INSTALLED=Y
         fi
     # elif [ "$PKG_MGR" = "apt" ]; then
     #     if dpkg -s $1 > /dev/null ; then
@@ -78,7 +78,24 @@ function check_package_and_install {
     #         ALREADY_INSTALLED=OK
     #     fi
     fi
-    if [ "$ALREADY_INSTALLED" = "KO" ]; then
+    [ "$ALREADY_INSTALLED" = "Y" ]
+}
+
+function check_package_and_install_no_root {
+    if ! check_package $1; then
+        echo -n "Installing $1 using $PKG_MGR without root... "
+        INSTALL_NO_ROOT=`(echo "$ISNTALL_PKG" | sed "s/sudo //g")`
+        if $INSTALL_PKG $1; then
+            echo "\033[0;32mOK\033[0m"
+        else 
+            echo "$\033[0;31mKO\033[0m"
+            return 1
+        fi
+    fi
+    return 0
+}
+function check_package_and_install {
+    if ! check_package $1; then
         echo -n "Installing $1 using $PKG_MGR... "
         if $INSTALL_PKG $1; then
             echo "\033[0;32mOK\033[0m"
@@ -262,7 +279,7 @@ check_and_install hyperfine || check_and_install_using "cargo install" hyperfine
 check_and_install just || check_and_install_using "cargo install" just # https://github.com/casey/just
 check_package_and_install the_silver_searcher # https://github.com/ggreer/the_silver_searcher
 check_and_install fzf # https://github.com/junegunn/fzf
-check_package_and_install carapace-bin
+check_package_and_install carapace-bin || check_package_and_install_no_root carapace-bin # https://github.com/rsteube/carapace-bin
 check_and_install which
 
 if ! check_program xmake; then
