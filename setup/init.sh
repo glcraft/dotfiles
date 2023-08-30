@@ -60,25 +60,22 @@ function check_and_install {
 }
 
 function check_package {
-    ALREADY_INSTALLED=N
-    if [ "$PKG_MGR" = "pacman" ] || [ "$PKG_MGR" = "paru" ]; then
-        if pacman -Qs $1 >/dev/null 2>&1 ; then
-            ALREADY_INSTALLED=Y
-        fi
-    # elif [ "$PKG_MGR" = "apt" ]; then
-    #     if dpkg -s $1 > /dev/null ; then
-    #         ALREADY_INSTALLED=OK
-    #     fi
-    # elif [ "$PKG_MGR" = "dnf" ]; then
-    #     if dnf list installed $1 > /dev/null ; then
-    #         ALREADY_INSTALLED=OK
-    #     fi
-    # elif [ "$PKG_MGR" = "yum" ]; then
-    #     if yum list installed $1 > /dev/null ; then
-    #         ALREADY_INSTALLED=OK
-    #     fi
+    if check_program pacman; then
+        pacman -Qs $1 >/dev/null 2>&1
+    elif check_program dpkg-query; then
+        dpkg-query -W $1 >/dev/null 2>&1
+    elif check_program dpkg; then
+        dpkg -s $1 >/dev/null 2>&1
+    elif check_program rpm; then
+        rpm -q $1 >/dev/null 2>&1
+    elif check_program brew; then
+        brew list $1 >/dev/null 2>&1
+    elif check_program cargo; then
+        cargo install --list | grep -E "$1 v[0-9.]+:" >/dev/null 2>&1
+    else
+        echo "No package manager found!"
+        exit 1
     fi
-    [ "$ALREADY_INSTALLED" = "Y" ]
 }
 
 function check_package_and_install_no_root {
