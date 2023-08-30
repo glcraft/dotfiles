@@ -242,10 +242,6 @@ fi
 # download and install nu shell
 check_package_and_install nushell || check_and_install_using "cargo install" nu
 
-# install dot files and folders
-echo "Installing dot files and folders..."
-find . -maxdepth 1 -path "./.*" -not -name ".git" -exec cp -r '{}' ~/ \;
-
 # install zimfw
 echo "Installing zimfw..."
 (download https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh && zimfw install) && echo "$(echo $RED)OK" || echo "$(echo $GREEN)KO"
