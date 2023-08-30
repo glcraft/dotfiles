@@ -268,6 +268,12 @@ if ! check_program starship; then
     (download https://starship.rs/install.sh | sh) && echo "$(echo $RED)OK" || echo "$(echo $GREEN)KO"
 fi
 
+# install xmake 
+if ! check_program xmake; then
+    curl -fsSL https://xmake.io/shget.text | bash
+    [ -f ~/.xmake/profile ] && source ~/.xmake/profile && xmake update -s dev || ~/.local/bin/xmake update -s dev
+fi
+
 # install bunch of useful tools
 
 check_and_install bat || check_and_install_using "cargo install" bat # https://github.com/sharkdp/bat
@@ -282,10 +288,7 @@ check_and_install fzf # https://github.com/junegunn/fzf
 check_package_and_install carapace-bin || check_package_and_install_no_root carapace-bin # https://github.com/rsteube/carapace-bin
 check_and_install which
 
-if ! check_program xmake; then
-    curl -fsSL https://xmake.io/shget.text | bash
-    [ -f ~/.xmake/profile ] && source ~/.xmake/profile && xmake update -s dev || ~/.local/bin/xmake update -s dev
-fi
+
 
 # install graphical apps
 if [ "$GRAPHICAL" = Y ]; then
