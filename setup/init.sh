@@ -243,8 +243,10 @@ fi
 check_package_and_install nushell || check_and_install_using "cargo install" nu
 
 # install zimfw
-echo "Installing zimfw..."
-(download https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh && zimfw install) && echo "$(echo $RED)OK" || echo "$(echo $GREEN)KO"
+if ! check_program zimfw; then
+    echo "Installing zimfw..."
+    (download https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh && zimfw install) && echo "$(echo $RED)OK" || echo "$(echo $GREEN)KO"
+fi
 
 echo -n "Installing starship prompt from starship.rs/install.sh... "
 (download https://starship.rs/install.sh | sh) && echo "$(echo $RED)OK" || echo "$(echo $GREEN)KO"
