@@ -547,9 +547,10 @@ $env.config = {
 source ~/.config/starship/init.nu
 
 # init atuin
-if (not (which atuin | is-empty)) and ("~/.cache/atuin/init.nu" | path exists) {
-  source ~/.cache/atuin/init.nu
-}
+source ~/.config/atuin/init.nu
+# if (not (which atuin | is-empty)) and ("~/.cache/atuin/init.nu" | path exists) {
+#   source ~/.cache/atuin/init.nu
+# }
 
 def-env pwd [] {
     $env.PWD
