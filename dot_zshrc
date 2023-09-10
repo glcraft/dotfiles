@@ -148,4 +148,10 @@ alias la="exa -la"
 
 which carapace >/dev/null 2>&1 && source <(carapace _carapace)
 
-which atuin >/dev/null 2>&1 && eval "$(atuin init zsh)"
+if which atuin >/dev/null 2>&1; then 
+  if [ -f ~/.config/atuin/init.zsh ]; then
+    source ~/.config/atuin/init.zsh
+  else 
+    eval "$(atuin init zsh)"
+  fi
+fi
