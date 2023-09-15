@@ -1,0 +1,2 @@
+EDITOR=nvim
+PAGER=most

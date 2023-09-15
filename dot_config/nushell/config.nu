@@ -235,23 +235,18 @@ let light_theme = {
     shape_matching_brackets: { attr: u }
 }
 
-# External completer example
-let carapace_completer = {|spans| 
-    carapace $spans.0 nushell $spans | from json
-}
-let has_carapace = ((which carapace | length) > 0)
-
-# Xmake completer
 let xmake_completer = {|spans| 
   XMAKE_SKIP_HISTORY=1 XMAKE_ROOT=y xmake lua 'private.utils.complete' 0 'nospace-json' $spans | from json | sort-by value
 }
 let xrepo_completer = {|spans| 
   XMAKE_SKIP_HISTORY=1 XMAKE_ROOT=y xmake lua 'private.xrepo.complete' 0 'nospace-json' $spans | from json | sort-by value
 }
-
+let carapace_completer = {|spans| 
+  carapace $spans.0 nushell $spans | from json
+}
 let external_completer = {|spans| 
-  {
-    $spans.0: (if $has_carapace { $carapace_completer } else { {|spans| { } } })
+  {$spans.0: $carapace_completer}
+  | merge {
     xmake: $xmake_completer
     xrepo: $xrepo_completer
   } | get ($spans.0) | each {|it| do $it $spans}
@@ -259,7 +254,7 @@ let external_completer = {|spans|
 
 
 # The default config record. This is where much of your global configuration is setup.
-let-env config = {
+$env.config = {
   ls: {
     use_ls_colors: true # use the LS_COLORS environment variable to colorize output
     clickable_links: true # enable or disable clickable links. Your terminal has to support links.
@@ -307,7 +302,7 @@ let-env config = {
   use_ansi_coloring: true
   edit_mode: emacs # emacs, vi
   shell_integration: true # enables terminal markers and a workaround to arrow keys stop working issue
-  show_banner: true # true or false to enable or disable the banner
+  show_banner: false # true or false to enable or disable the banner
   render_right_prompt_on_last_line: false # true or false to enable or disable right prompt to be rendered on last line of the prompt.
   hooks: {
     pre_prompt: [{
@@ -549,6 +544,14 @@ let-env config = {
 }
 
 # init starship
-source ~/.cache/starship/init.nu
+source ~/.config/starship/init.nu
 
-# alias pwd = $env.PWD
+# init atuin
+source ~/.config/atuin/init.nu
+# if (not (which atuin | is-empty)) and ("~/.cache/atuin/init.nu" | path exists) {
+#   source ~/.cache/atuin/init.nu
+# }
+
+def-env pwd [] {
+    $env.PWD
+}

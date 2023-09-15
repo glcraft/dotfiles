@@ -1,4 +1,120 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+RED="\033[0;31m"
+GREEN="\033[0;32m"
+GRAPHICAL=N
+
+# parse arguments
+while (( "$#" )); do
+    opt="$1"
+    case $opt in
+        --graphical)
+            GRAPHICAL=Y
+            ;;
+        -h|--help)
+            cat << EOF
+Usage: $(basename $0) [--graphical] [-h|--help]
+    --graphical                 install graphical apps (default: no)
+    -h|--help                   show this help message"
+EOF
+            exit 0
+            ;;
+        *)
+            echo "Invalid option: $opt"
+            exit 1
+            ;;
+    esac
+    shift
+done
+
+# quit if not in dotfile directory
+if [ ! -f "setup/init.sh" ]; then
+    echo "Please run this script in the dotfile directory!"
+    exit 1
+fi
+
+if ! which which 1>/dev/null 2>&1; then
+    echo "Install the command 'which' first!"
+    exit 1
+fi
+
+# check if a program exists
+function check_program {
+    which $1 2>/dev/null 1>&2
+}
+
+# check if a program exists and install it if not
+function check_and_install {
+    for prog in $@; do
+        if ! check_program $prog; then
+            echo -n "Installing $prog using $PKG_MGR... "
+            if $INSTALL_PKG $prog; then
+                echo "\033[0;32mOK\033[0m"
+            else 
+                echo "$\033[0;31mKO\033[0m"
+                return 1
+            fi
+        fi
+    done
+    return 0
+}
+
+function check_package {
+    if check_program pacman; then
+        pacman -Qs $1 >/dev/null 2>&1
+    elif check_program dpkg-query; then
+        dpkg-query -W $1 >/dev/null 2>&1
+    elif check_program dpkg; then
+        dpkg -s $1 >/dev/null 2>&1
+    elif check_program rpm; then
+        rpm -q $1 >/dev/null 2>&1
+    elif check_program brew; then
+        brew list $1 >/dev/null 2>&1
+    elif check_program cargo; then
+        cargo install --list | grep -E "$1 v[0-9.]+:" >/dev/null 2>&1
+    else
+        echo "No package manager found!"
+        exit 1
+    fi
+}
+
+function check_package_and_install_no_root {
+    if ! check_package $1; then
+        echo -n "Installing $1 using $PKG_MGR without root... "
+        INSTALL_NO_ROOT=`(echo "$ISNTALL_PKG" | sed "s/sudo //g")`
+        if $INSTALL_NO_ROOT $1; then
+            echo "\033[0;32mOK\033[0m"
+        else 
+            echo "$\033[0;31mKO\033[0m"
+            return 1
+        fi
+    fi
+    return 0
+}
+function check_package_and_install {
+    if ! check_package $1; then
+        echo -n "Installing $1 using $PKG_MGR... "
+        if $INSTALL_PKG $1; then
+            echo "\033[0;32mOK\033[0m"
+        else 
+            echo "$\033[0;31mKO\033[0m"
+            return 1
+        fi
+    fi
+    return 0
+}
+function check_and_install_using {
+    if ! check_program $2; then
+        echo -n "Installing $2 using "$1"... "
+        if $1 $2; then
+            echo "\033[0;32mOK\033[0m"
+        else 
+            echo "$\033[0;31mKO\033[0m"
+            return 1
+        fi
+    fi
+    return 0
+}
 
 # grant sudo permission
 if [ "$(whoami)" != "root" ]; then
@@ -8,8 +124,10 @@ if [ "$(whoami)" != "root" ]; then
     while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 fi
 
-# Create a temporary directory to store the downloaded files
-mkdir -p /tmp/init
+TMPDIR=$(mktemp -d)
+
+[ "$(uname)" == "Darwin" ] && ISMACOS=1 || ISMACOS=0
+[ "$(uname)" == "Linux" ] && ISLINUX=1 || ISLINUX=0
 
 #function to quit the script if any command fails
 function quit_if_failed {
@@ -19,70 +137,65 @@ function quit_if_failed {
     fi
 }
 function download {
-    if [ "$(which wget)" != "" ]; then
+    if check_program wget; then
         wget -O - "$1"
-    elif [ "$(which curl)" != "" ]; then
+    elif check_program curl; then
         curl -fsSL "$1"
     fi
 }
 
-function install_brew {
-    if [ "$(which curl)" == "" ]; then
-        echo "Installing curl..."
-        $INSTALL_PKG curl
-    fi
-    echo "Installing brew..."
-    bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    if [ "$(uname)" == "Linux" ]; then
-        echo '# Set PATH, MANPATH, etc., for Homebrew.' >> $HOME/.profile
-        echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> $HOME/.profile
-        eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-    fi
-}
-
-# select a package manager
-if [ "$(uname)" == "Darwin" ]; then
+# Select a package manager
+# On MacOS...
+if [ $ISMACOS -eq 1 ]; then
     # On macOS, install brew if it's not already installed
-    if [ "$(which brew)" == "" ]; then
-        install_brew
+    if ! check_program brew; then
+        check_and_install curl
+        echo "Installing brew..."
+        bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        if [ $ISLINUX -eq 1 ]; then
+            echo '# Set PATH, MANPATH, etc., for Homebrew.' >> $HOME/.profile
+            echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> $HOME/.profile
+            eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+        fi
     fi
     echo "Using brew as package manager..."
     PKG_MGR="brew"
     INSTALL_PKG="$PKG_MGR install"
     echo "Updating brew..."
     $INSTALL_PKG update && $INSTALL_PKG upgrade || quit_if_failed "brew update && brew upgrade"
-elif [ "$(uname)" == "Linux" ]; then
-    if [ "$(which apt)" != "" ]; then
+# On Linux...
+elif [ $ISLINUX -eq 1 ]; then
+    if check_program apt; then
         echo "Using apt as package manager..."
         PKG_MGR="apt"
-        INSTALL_PKG="sudo $PKG_MGR install"
+        INSTALL_PKG="sudo $PKG_MGR install -y"
         echo "Updating apt..."
         sudo $PKG_MGR update && sudo $PKG_MGR upgrade -y || quit_if_failed "apt update && apt upgrade"
-    elif [ "$(which apt-get)" != "" ]; then
+    elif check_program apt-get; then
         echo "Using apt-get as package manager..."
         PKG_MGR="apt-get"
-        INSTALL_PKG="sudo $PKG_MGR install"
+        INSTALL_PKG="sudo $PKG_MGR install -y"
         echo "Updating apt-get..."
         sudo $PKG_MGR update && sudo $PKG_MGR upgrade || quit_if_failed "apt-get update && apt-get upgrade"
-    elif [ "$(which yum)" != "" ]; then
+    elif check_program yum; then
         echo "Using yum as package manager..."
         PKG_MGR="yum"
-        INSTALL_PKG="sudo $PKG_MGR install"
+        INSTALL_PKG="sudo $PKG_MGR install -y"
         echo "Updating yum..."
         sudo $PKG_MGR update && sudo $PKG_MGR upgrade || quit_if_failed "yum update && yum upgrade"
-    elif [ "$(which dnf)" != "" ]; then
+    elif check_program dnf; then
         echo "Using dnf as package manager..."
         PKG_MGR="dnf"
-        INSTALL_PKG="sudo $PKG_MGR install"
+        INSTALL_PKG="sudo $PKG_MGR install -y"
         echo "Updating dnf..."
         sudo $PKG_MGR update && sudo $PKG_MGR upgrade || quit_if_failed "dnf update && dnf upgrade"
-    elif [ "$(which pacman)" != "" ]; then
+    elif check_program pacman; then
         echo "Using pacman as package manager..."
         PKG_MGR="pacman"
-        INSTALL_PKG="sudo $PKG_MGR -S"
+        INSTALL_PKG="sudo $PKG_MGR -S --noconfirm"
         echo "Updating pacman..."
-        sudo $PKG_MGR -Syu
-    elif [ "$(which brew)" != "" ]; then
+        sudo $PKG_MGR -Syu --noconfirm || quit_if_failed "pacman -Syu --noconfirm"
+    elif check_program brew; then
         echo "Using brew as package manager..."
         PKG_MGR="brew"
         INSTALL_PKG="$PKG_MGR install"
@@ -93,112 +206,95 @@ elif [ "$(uname)" == "Linux" ]; then
         exit 1
     fi
 fi
-INSTALL_PKG="sudo $INSTALL_PKG -y"
 
-# install git
-if [ "$(which git)" == "" ]; then
+#install zsh
+check_and_install zsh
+
+# install base-devel on linux
+if [ $ISLINUX -eq 1 ] && ! check_program gcc; then
+    if check_program pacman; then
+        echo "Installing base-devel..."
+        $INSTALL_PKG base-devel
+    elif check_program apt || check_program apt-get; then
+        echo "Installing build-essential..."
+        $INSTALL_PKG build-essential
+    elif check_program yum || check_program dnf; then
+        echo "Installing groupinstall development tools..."
+        $INSTALL_PKG groupinstall development tools
+    fi
+fi
+
+# install rust
+if ! check_program rustup; then
+    echo "Installing rust..."
+    ($INSTALL_PKG rustup && rustup toolchain add stable)|| curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s - -y
+fi
+
+# install git if not already installed
+if ! check_program git; then
     echo "Installing git..."
     $INSTALL_PKG git
 fi
 
 # install paru on arch linux
-if [ "$(uname)" == "Linux" ] && [ "$(which pacman)" != "" ] && [ "$(which paru)" == "" ]; then
+if [ $ISLINUX -eq 1 ] && check_program pacman && ! check_program paru; then
+    check_and_install pkg-config
     echo "Installing paru..."
-    git clone https://aur.archlinux.org/paru.git /tmp/init/paru
-    pushd /tmp/init/paru
+    git clone https://aur.archlinux.org/paru.git "$TMPDIR/paru"
+    pushd $TMPDIR/paru
     makepkg -si
     popd
 fi
+
 # use paru as package manager 
-if [ "$(which paru)" != "" ]; then
+if check_program paru; then
     echo "Using paru as package manager instead..."
     PKG_MGR="paru"
-    INSTALL_PKG="sudo $PKG_MGR -S"
+    INSTALL_PKG="sudo $PKG_MGR -S --noconfirm"
 fi
 
 # download and install nu shell
-if [ "$(which nu)" == "" ]; then
-    # install brew for linux if needed
-    if [ "$(which pacman)" == "" ] && [ "$(which brew)" == "" ]; then
-        install_brew
-    fi
-    echo "Installing nu shell..."
-    INSTALL=KO
-    if [ "$(which pacman)" != "" ]; then
-        sudo pacman -S nushell && INSTALL=OK
-    elif [ "$(which brew)" != "" ]; then
-        brew install nushell && INSTALL=OK
-    fi
-    if [ $INSTALL != OK ]; then
-        echo "Unable to install nushell. Skip..."
-    else
-        # ask for setting nu as default shell
-        echo "Do you want to set nu as your default shell? [y/N]"
-        read -r SET_NU_AS_DEFAULT
-        if [ "$SET_NU_AS_DEFAULT" == "y" ]; then
-            echo "Setting nu as default shell..."
-            sudo chsh -s "$(which nu)"
-        fi
-    fi
+check_package_and_install nushell || check_and_install_using "cargo install" nu
+
+# install zimfw
+if ! check_program zimfw; then
+    echo "Installing zimfw..."
+    (download https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh && zimfw install) && echo "$(echo $RED)OK" || echo "$(echo $GREEN)KO"
 fi
 
-# install dot files and folders
-echo "Installing dot files and folders..."
-cp -r .cache .cargo .config .zshrc  ~/
+# install starship prompt
+if ! check_program starship; then
+    echo -n "Installing starship prompt from starship.rs/install.sh... "
+    (download https://starship.rs/install.sh | sh) && echo "$(echo $RED)OK" || echo "$(echo $GREEN)KO"
+fi
 
-#ask for starship prompt or powerlevel10k
-echo "Which prompt do you want to install ?"
-echo "- starship        [1, default]"
-echo "- powerlevel10k   [2]"
-echo "- none            [0]"
-read -r PROMPT
-case $PROMPT in
-    1|*)
-        if [ "$(which starship)" == "" ]; then
-            echo "Installing starship prompt..."
-            if [ "$(which pacman)" != "" ] || [ "$(which paru)" != "" ]; then
-                $INSTALL_PKG starship
-            elif [ "$(which dnf)" != "" ]; then
-                dnf copr enable atim/starship
-                dnf install starship
-            elif [ "$(which brew)" != "" ]; then
-                $INSTALL_PKG starship
-            else
-                echo "Installing starship prompt from starship.rs/install.sh..."
-                download https://starship.rs/install.sh | sh
-            fi
-        else
-            echo "Starship prompt already installed!"
-        fi
-        # add starship to zshrc
-        cat <<EOF
-# Initialize Starship
-eval "$(starship init zsh)"
-EOF >> ~/.zshrc
-        # add starship to nu config
-        cat <<EOF
-# Initialize Starship
-eval "$(starship init zsh)"
-EOF >> $(nu -c '$nu.config-path')
-        ;;
-    2)
-        echo "Installing zimfw..."
-        download https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh
-        echo "Installing powerlevel10k..."
-        cat << EOF
-# Use powerlevel10k theme
-zmodule romkatv/powerlevel10k --use degit
-EOF >> ~/.zimrc
-        zimfw install
-                cat <<EOF
-# To customize prompt, run `p10k configure` or edit ~/.config/.p10k.zsh.
-[[ ! -f ~/.config/.p10k.zsh ]] || source ~/.config/.p10k.zsh
-EOF >> ~/.zshrc
-        ;;
-    0)
-        echo "Skipping prompt installation..."
-        ;;
-esac
+# install xmake 
+if ! check_program xmake; then
+    curl -fsSL https://xmake.io/shget.text | bash
+    [ -f ~/.xmake/profile ] && source ~/.xmake/profile && xmake update -s dev || ~/.local/bin/xmake update -s dev
+fi
 
-# remove temporary directory
-rm -rf /tmp/init
+# install bunch of useful tools
+
+check_and_install bat || check_and_install_using "cargo install" bat # https://github.com/sharkdp/bat
+check_package_and_install tealdeer || check_and_install_using "cargo install" tealdeer # https://github.com/dbrgn/tealdeer
+check_package_and_install fd-find || check_and_install fd || check_and_install_using "cargo install" fd-find # https://github.com/sharkdp/fd
+check_package_and_install ripgrep || check_and_install_using "cargo install" ripgrep # https://github.com/BurntSushi/ripgrep
+check_and_install exa || check_and_install_using "cargo install" exa # https://github.com/ogham/exa
+check_and_install hyperfine || check_and_install_using "cargo install" hyperfine # https://github.com/sharkdp/hyperfine
+check_and_install just || check_and_install_using "cargo install" just # https://github.com/casey/just
+check_package_and_install the_silver_searcher # https://github.com/ggreer/the_silver_searcher
+check_and_install fzf # https://github.com/junegunn/fzf
+check_package_and_install carapace-bin || check_package_and_install_no_root carapace-bin # https://github.com/rsteube/carapace-bin
+check_and_install which
+
+
+
+# install graphical apps
+if [ "$GRAPHICAL" = Y ]; then
+    $INSTALL_PKG discord keepassxc --needed
+    # ...from the AUR
+    if [ "$PKG_MGR" = "paru" ]; then
+        paru --noconfirm -S microsoft-edge-stable-bin visual-studio-code-bin --needed
+    fi
+fi
