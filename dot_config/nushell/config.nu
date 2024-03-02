@@ -160,7 +160,8 @@ let dark_theme = {
     shape_float: purple_bold
     shape_range: yellow_bold
     shape_internalcall: cyan_bold
-    shape_external: cyan
+    shape_external: darkorange                  # external "commands" that do not exist, will be this color
+    shape_external_resolved: light_yellow_bold  # external commands that are found with `which`, will be this color
     shape_externalarg: green_bold
     shape_literal: blue
     shape_operator: yellow
@@ -213,7 +214,8 @@ let light_theme = {
     shape_float: purple_bold
     shape_range: yellow_bold
     shape_internalcall: cyan_bold
-    shape_external: cyan
+    shape_external: darkorange                  # external "commands" that do not exist, will be this color
+    shape_external_resolved: light_yellow_bold  # external commands that are found with `which`, will be this color
     shape_externalarg: green_bold
     shape_literal: blue
     shape_operator: yellow
@@ -233,23 +235,29 @@ let light_theme = {
     shape_custom: green
     shape_nothing: light_cyan
     shape_matching_brackets: { attr: u }
+
+    
 }
 
+# External completer example
+let carapace_completer = {|spans| 
+    carapace $spans.0 nushell $spans | from json
+}
+
+# Xmake completer
 let xmake_completer = {|spans| 
   XMAKE_SKIP_HISTORY=1 XMAKE_ROOT=y xmake lua 'private.utils.complete' 0 'nospace-json' $spans | from json | sort-by value
 }
 let xrepo_completer = {|spans| 
   XMAKE_SKIP_HISTORY=1 XMAKE_ROOT=y xmake lua 'private.xrepo.complete' 0 'nospace-json' $spans | from json | sort-by value
 }
-let carapace_completer = {|spans| 
-  carapace $spans.0 nushell $spans | from json
-}
+
 let external_completer = {|spans| 
   {$spans.0: $carapace_completer}
   | merge {
     xmake: $xmake_completer
     xrepo: $xrepo_completer
-  } | get ($spans.0) | each {|it| do $it $spans}
+  } | get $spans.0 | each {|it| do $it $spans}
 }
 
 
@@ -261,9 +269,6 @@ $env.config = {
   }
   rm: {
     always_trash: false # always act as if -t was given. Can be overridden with -p
-  }
-  cd: {
-    abbreviations: true # allows `cd s/o/f` to expand to `cd some/other/folder`
   }
   table: {
     mode: rounded # basic, compact, compact_double, light, thin, with_love, rounded, reinforced, heavy, none, other
@@ -294,6 +299,7 @@ $env.config = {
     metric: true # true => KB, MB, GB (ISO standard), false => KiB, MiB, GiB (Windows standard)
     format: "auto" # b, kb, kib, mb, mib, gb, gib, tb, tib, pb, pib, eb, eib, zb, zib, auto
   }
+  highlight_resolved_externals: true
   color_config: $dark_theme   # if you want a light theme, replace `$dark_theme` to `$light_theme`
   use_grid_icons: true
   footer_mode: "25" # always, never, number_of_rows, auto
@@ -305,18 +311,18 @@ $env.config = {
   show_banner: false # true or false to enable or disable the banner
   render_right_prompt_on_last_line: false # true or false to enable or disable right prompt to be rendered on last line of the prompt.
   hooks: {
-    pre_prompt: [{
-      $nothing  # replace with source code to run before the prompt is shown
+    pre_prompt: [{||
+      null  # replace with source code to run before the prompt is shown
     }]
-    pre_execution: [{
-      $nothing  # replace with source code to run before the repl input is run
+    pre_execution: [{||
+      null  # replace with source code to run before the repl input is run
     }]
     env_change: {
       PWD: [{|before, after|
-        $nothing  # replace with source code to run if the PWD environment is different since the last repl input
+        null  # replace with source code to run if the PWD environment is different since the last repl input
       }]
     }
-    display_output: {
+    display_output: {||
       if (term size).columns >= 100 { table -e } else { table }
     }
   }
@@ -543,15 +549,16 @@ $env.config = {
   ]
 }
 
-# init starship
-source ~/.config/starship/init.nu
+source ~/.cache/starship/init.nu
+source ~/.local/share/atuin/init.nu
 
-# init atuin
-source ~/.config/atuin/init.nu
-# if (not (which atuin | is-empty)) and ("~/.cache/atuin/init.nu" | path exists) {
-#   source ~/.cache/atuin/init.nu
-# }
+use ~/.scripts/record.nu
 
-def-env pwd [] {
-    $env.PWD
-}
+# use ~/Projects/nu-scripts/openai.nu
+use std
+
+alias ? = aio -e openai:command --run ask
+alias ?? = aio -e openai:ask
+
+alias fzf-code = fzf --preview "bat --color=always --style=numbers --line-range=:500 {}"
+# alias pwd = std pwd
