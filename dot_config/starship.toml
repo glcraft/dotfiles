@@ -1,8 +1,24 @@
-# Get editor completions based on the config schema
-"$schema" = 'https://starship.rs/config-schema.json'
-
-# Inserts a blank line between shell prompts
-add_newline = true
+format = """
+[\ue0b6](#444444)\
+$os\
+[](bg:#444444 fg:#A9A7BC)\
+$directory\
+[](fg:#A9A7BC bg:#444444)\
+$nodejs\
+$rust\
+$golang\
+$php\
+$cmake\
+$custom\
+$c\
+[](fg:#A9A7BC bg:#444444)\
+$git_branch\
+$git_status\
+[](fg:#A9A7BC bg:#444444)\
+$time\
+[\ue0b4 ](fg:#444444)\
+\n\
+$shell$character"""
 
 [character]
 success_symbol = "[\uead3](bold green)"
@@ -15,5 +31,76 @@ powershell_indicator="\uebc7"
 bash_indicator="\uebca"
 # nu_indicator="\uf893"
 
-[lua]
-disabled = true
+[directory]
+style = "fg:#00AFFF bg:#444444"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncation_symbol = "…/"
+
+[directory.substitutions]
+"Documents" = "󰈙 "
+"Downloads" = " "
+"Music" = " "
+"Pictures" = " "
+
+[git_branch]
+symbol = ""
+style = "fg:#FF8C00 bg:#444444"
+format = '[ $symbol $branch ]($style)'
+
+[git_status]
+style = "fg:#FF8C00 bg:#444444"
+format = '[($all_status$ahead_behind )]($style)'
+
+[nodejs]
+symbol = ""
+style = "fg:#F8F8F2 bg:#444444"
+format = '[ $symbol ($version) ]($style)'
+
+[rust]
+symbol = ""
+style = "fg:#F8F8F2 bg:#444444"
+format = '[ $symbol ($version) ]($style)'
+
+[golang]
+symbol = ""
+style = "fg:#F8F8F2 bg:#444444"
+format = '[ $symbol ($version) ]($style)'
+
+[c]
+symbol = "\ue61e"
+style = "fg:#F8F8F2 bg:#444444"
+format = '[ $symbol ($version) ]($style)'
+
+[cmake]
+symbol = "\ue61d"
+style = "bold fg:#F8F8F2 bg:#444444"
+format = '[ $symbol CMake ($version) ]($style)'
+
+[custom.xmake]
+symbol = "\ue61d"
+style = "bold fg:#F8F8F2 bg:#444444"
+format = '[ $symbol XMake ($output) ]($style)'
+detect_files = ['xmake.lua']
+command = '''xmake --version | grep -E -o 'v([0-9]*)\.([0-9]*)\.([0-9]*)\+([0-9]*)' '''
+
+[php]
+symbol = ""
+style = "bg:#444444"
+format = '[[ $symbol ($version) ](fg:#89ACFF bg:#444444)]($style)'
+
+[time]
+disabled = false
+time_format = "%R" # Hour:Minute Format
+style = "fg:#B5BEFF bg:#444444"
+format = '[  $time ]($style)'
+
+[os]
+style = "bold fg:#FFFFFF bg:#444444"
+format = "[ $symbol ]($style)"
+disabled = false
+
+[os.symbols]
+Macos = ""
+Linux = ""
+Windows = ""
