@@ -1,9 +1,7 @@
 format = """
 [\ue0b6](#444444)\
-$os\
-[](bg:#444444 fg:#A9A7BC)\
-$directory\
-[](fg:#A9A7BC bg:#444444)\
+$os[\ue0b1](fg:#A9A7BC bg:#444444)\
+$directory[\ue0b1](fg:#A9A7BC bg:#444444)\
 $nodejs\
 $rust\
 $golang\
@@ -11,12 +9,10 @@ $php\
 $cmake\
 $custom\
 $c\
-[](fg:#A9A7BC bg:#444444)\
 $git_branch\
 $git_status\
-[](fg:#A9A7BC bg:#444444)\
 $time\
-[\ue0b4 ](fg:#444444)\
+[\ue0b4](fg:#444444)\
 \n\
 $shell$character"""
 
@@ -32,7 +28,7 @@ bash_indicator="\uebca"
 # nu_indicator="\uf893"
 
 [directory]
-style = "fg:#00AFFF bg:#444444"
+style = "fg:#00BEFF bg:#444444"
 format = "[ $path ]($style)"
 truncation_length = 3
 truncation_symbol = "…/"
@@ -50,44 +46,44 @@ format = '[ $symbol $branch ]($style)'
 
 [git_status]
 style = "fg:#FF8C00 bg:#444444"
-format = '[($all_status$ahead_behind )]($style)'
+format = "[($all_status$ahead_behind )]($style)[\ue0b1](fg:#A9A7BC bg:#444444)"
 
 [nodejs]
 symbol = ""
 style = "fg:#F8F8F2 bg:#444444"
-format = '[ $symbol ($version) ]($style)'
+format = "[ $symbol ($version) ]($style)[\ue0b1](fg:#A9A7BC bg:#444444)"
 
 [rust]
 symbol = ""
 style = "fg:#F8F8F2 bg:#444444"
-format = '[ $symbol ($version) ]($style)'
+format = "[ $symbol ($version) ]($style)[\ue0b1](fg:#A9A7BC bg:#444444)"
 
 [golang]
 symbol = ""
 style = "fg:#F8F8F2 bg:#444444"
-format = '[ $symbol ($version) ]($style)'
+format = "[ $symbol ($version) ]($style)[\ue0b1](fg:#A9A7BC bg:#444444)"
 
 [c]
 symbol = "\ue61e"
 style = "fg:#F8F8F2 bg:#444444"
-format = '[ $symbol ($version) ]($style)'
+format = "[ $symbol ($version) ]($style)[\ue0b1](fg:#A9A7BC bg:#444444)"
 
 [cmake]
 symbol = "\ue61d"
 style = "bold fg:#F8F8F2 bg:#444444"
-format = '[ $symbol CMake ($version) ]($style)'
+format = "[ $symbol CMake ($version) ]($style)[\ue0b1](fg:#A9A7BC bg:#444444)"
 
 [custom.xmake]
 symbol = "\ue61d"
 style = "bold fg:#F8F8F2 bg:#444444"
-format = '[ $symbol XMake ($output) ]($style)'
+format = "[ $symbol XMake ($output) ]($style)[\ue0b1](fg:#A9A7BC bg:#444444)"
 detect_files = ['xmake.lua']
 command = '''xmake --version | grep -E -o 'v([0-9]*)\.([0-9]*)\.([0-9]*)\+([0-9]*)' '''
 
 [php]
 symbol = ""
 style = "bg:#444444"
-format = '[[ $symbol ($version) ](fg:#89ACFF bg:#444444)]($style)'
+format = '[[ $symbol ($version) ](fg:#89ACFF bg:#444444)]($style)[\ue0b1](fg:#A9A7BC bg:#444444)'
 
 [time]
 disabled = false
@@ -96,11 +92,24 @@ style = "fg:#B5BEFF bg:#444444"
 format = '[  $time ]($style)'
 
 [os]
+disabled = false
 style = "bold fg:#FFFFFF bg:#444444"
 format = "[ $symbol ]($style)"
-disabled = false
 
 [os.symbols]
+Windows = ""
 Macos = ""
 Linux = ""
-Windows = ""
+Arch = ""
+Manjaro = ""
+Ubuntu = ""
+Debian = ""
+Fedora = ""
+Alpine = ""
+Amazon = ""
+Void = ""
+Gentoo = ""
+openSUSE = ""
+Raspbian = ""
+SUSE = ""
+Android = ""
