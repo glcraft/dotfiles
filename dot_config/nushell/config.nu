@@ -235,14 +235,17 @@ let light_theme = {
     shape_matching_brackets: { attr: u }
 }
 
+# External completer example
+let carapace_completer = {|spans| 
+    carapace $spans.0 nushell ...$spans | from json
+}
+
+# Xmake completer
 let xmake_completer = {|spans| 
   XMAKE_SKIP_HISTORY=1 XMAKE_ROOT=y xmake lua 'private.utils.complete' 0 'nospace-json' ...$spans | from json | sort-by value
 }
 let xrepo_completer = {|spans| 
   XMAKE_SKIP_HISTORY=1 XMAKE_ROOT=y xmake lua 'private.xrepo.complete' 0 'nospace-json' ...$spans | from json | sort-by value
-}
-let carapace_completer = {|spans| 
-  carapace $spans.0 nushell ...$spans | from json
 }
 let external_completer = {|spans| 
   

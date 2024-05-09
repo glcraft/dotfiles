@@ -142,9 +142,9 @@ else
 	[[ ! -f ~/.config/powerlevel10k/full.zsh ]] || source ~/.config/powerlevel10k/full.zsh
 fi
 
-alias ls=exa
-alias ll="exa -l"
-alias la="exa -la"
+alias ls=eza
+alias ll="eza -l"
+alias la="eza -la"
 
 which carapace >/dev/null 2>&1 && source <(carapace _carapace)
 
@@ -155,3 +155,4 @@ if which atuin >/dev/null 2>&1; then
     eval "$(atuin init zsh)"
   fi
 fi
+source ~/.scripts/init_jdk.sh
