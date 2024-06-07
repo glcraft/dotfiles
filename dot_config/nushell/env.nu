@@ -19,15 +19,15 @@ def create_right_prompt [] {
 }
 
 # Use nushell functions to define your right and left prompt
-$env.PROMPT_COMMAND = {|| create_left_prompt }
-$env.PROMPT_COMMAND_RIGHT = {|| create_right_prompt }
+$env.PROMPT_COMMAND = { create_left_prompt }
+$env.PROMPT_COMMAND_RIGHT = { create_right_prompt }
 
 # The prompt indicators are environmental variables that represent
 # the state of the prompt
-$env.PROMPT_INDICATOR = {|| "〉" }
-$env.PROMPT_INDICATOR_VI_INSERT = {|| ": " }
-$env.PROMPT_INDICATOR_VI_NORMAL = {|| "〉" }
-$env.PROMPT_MULTILINE_INDICATOR = {|| "::: " }
+$env.PROMPT_INDICATOR = { "〉" }
+$env.PROMPT_INDICATOR_VI_INSERT = { ": " }
+$env.PROMPT_INDICATOR_VI_NORMAL = { "〉" }
+$env.PROMPT_MULTILINE_INDICATOR = { "::: " }
 
 # Specifies how environment variables are:
 # - converted from a string to a value on Nushell startup (from_string)
@@ -58,26 +58,15 @@ $env.NU_PLUGIN_DIRS = [
     ($nu.config-path | path dirname | path join 'plugins')
 ]
 
-$env.BUN_INSTALL = $'($env.HOME)/.bun'
-
 # To add entries to PATH (on Windows you might use Path), you can use the following pattern:
 # $env.PATH = ($env.PATH | split row (char esep) | prepend '/some/path')
-# Import PATH from zsh
-$env.PATH = (zsh -l -c 'echo $PATH' 
+# get path env var from other shells
+if $nu.os-info.name != "windows" {
+    $env.PATH = (zsh -l -c 'echo $PATH' 
     | split row (char esep) 
     | prepend [
         '/Users/gly/.local/bin'
         '/opt/homebrew/bin'
-        $'($env.BUN_INSTALL)/bin'
     ] | uniq)
-$env.EDITOR = nvim
-$env.PAGER = most
+}
 
-
-source ~/.config/env-secret.nu
-
-# To use batpipe, eval the output of this command in your shell init script.
-$env.LESSOPEN = "|/opt/homebrew/Cellar/bat-extras-batpipe/2021.04.06/bin/batpipe %s"
-# The following will enable colors when using batpipe with less:
-$env.BATPIPE = "color"
-$env.LESS = $"($env | get -i LESS | default '') -R"

@@ -1,63 +1,88 @@
-openai:
-  prompts:
-    - name: command
-      messages: 
-        - role: system
-          content: >
-            You are a command line solver. Your job is to write a command or a script that best fits the user's request.
-            In markdown, write a "## Command" chapter then write in a code block the command.
-            The code block should have the correct language ID in the first line. For example, "```python" or "```zsh" if the user ask for python or zsh respectively. 
-            If the user doesn't specify a language, the code block language is the default operating system shell language. 
-            If the user doesn't specify the operating system, the command block language is "zsh" by default. 
-            Then describe each parameter and the command in "## Explanation" chapter. 
-        - role: user
-          content: $input
-      parameters:
-        temperature: 0
-        top-p: 1.0 
-        frequency-penalty: 0.2
-        presence-penalty: 0 
-        max-tokens: 200
-    - name: ask
-      model: gpt-4-1106-preview
-      messages: 
-        - role: system
-          content: You are ChatGPT, a powerful conversational chatbot. Answer to me in informative way unless I tell you otherwise. Format the text in markdown.
-        - role: user
-          content: $input
-      parameters:
-        temperature: 0.7 
-        top-p: 1.0 
-        frequency-penalty: 0 
-        presence-penalty: 0 
-        max-tokens: 300
-    - name: cdd_candid
-      model: gpt-4-1106-preview
-      messages: 
-        - role: system
-          content: >
-            Tu vas m'aider à faire le compte rendu d'une candidature pour devenir développeur. Il faut que tu analyse la discussion du jury (nommé vic1707 et Gly) et synthétiser en listant entre cinq et dix points importants en faveur ou contre l'acceptation de la candidature.
+prompts:
+  - name: ask
+    messages: 
+      - role: system
+        content: You are a powerful intelligent conversational chatbot. Unless I tell you otherwise, answer to me in an informative way. You should format the text in Markdown.
+      - role: user
+        content: $input
+      - role: assistant
+    parameters:
+      temperature: 0.7 
+      top-p: 1.0 
+      frequency-penalty: 0 
+      presence-penalty: 0 
+      max-tokens: 300
+  - name: command
+    messages: 
+      - role: system
+        content: >
+          You are a command line solver. Your job is to write a command or a script that best fits the user's request.
+          In markdown, write a "## Command" chapter then write in a code block the command.
+          The code block should have the correct language ID in the first line. For example, "```python" or "```zsh" if the user ask for python or zsh respectively. 
+          If the user doesn't specify a language, the code block language is the default operating system shell language. 
+          If the user doesn't specify the operating system, the command block language is "zsh" by default. 
+          Then describe each parameter and the command in "## Explanation" chapter. 
+      - role: user
+        content: $input
+      - role: assistant
+    parameters:
+      temperature: 0
+      top-p: 1.0 
+      frequency-penalty: 0.2
+      presence-penalty: 0 
+      max-tokens: 200
+  - name: cdd_candid
+    messages: 
+      - role: system
+        content: >
+          Tu vas m'aider à faire le compte rendu d'une candidature pour devenir développeur. Il faut que tu analyse la discussion du jury (nommé vic1707 et Gly) et synthétiser en listant entre cinq et dix points importants en faveur ou contre l'acceptation de la candidature.
 
-            Voici le barème des points importants qu'on applique à la candidature ainsi que leur explication : 
-            :rv_excellent: : excellent code/algorithmie/gestion de projet, idées astucieuses, application des bonnes pratiques impeccables, excellente comprehension du langage et de son environnement de développement
-            :rv_good: : Code satisfaisant, bonnes idées, application des bonnes pratiques, bonne comprehension du langage et de son environnement de développement 
-            :rv_correct: : Code correct, utilisation remarquable de fonctionnalité du langage, savoir utiliser git
-            :rv_suspicious: :  Le code est mal agencé et/ou manque d'organisation, tel que l'enchainement de bloc de code (if), projet monolithique ou non modulable, 
-            :rv_mistake:  : application de mauvaise pratique tel que l'envoi de dépendance sur github, programme lent, ou des erreurs et failles menant à arrêter l'execution du code. 
-            :rv_eliminatory: : erreurs importantes de failles de sécurité telles que la publication de secrets (par exemple clé api ou mot de passe) sur git/github, injection SQL dans le code, injection de code sur un serveur ou secret stocké en clair dans la base de données (non haché).
+          Voici le barème des points importants qu'on applique à la candidature ainsi que leur explication : 
+          :rv_excellent: : excellent code/algorithmie/gestion de projet, idées astucieuses, application des bonnes pratiques impeccables, excellente comprehension du langage et de son environnement de développement
+          :rv_good: : Code satisfaisant, bonnes idées, application des bonnes pratiques, bonne comprehension du langage et de son environnement de développement 
+          :rv_correct: : Code correct, utilisation remarquable de fonctionnalité du langage, savoir utiliser git
+          :rv_suspicious: :  Le code est mal agencé et/ou manque d'organisation, tel que l'enchainement de bloc de code (if), projet monolithique ou non modulable, 
+          :rv_mistake:  : application de mauvaise pratique tel que l'envoi de dépendance sur github, programme lent, ou des erreurs et failles menant à arrêter l'execution du code. 
+          :rv_eliminatory: : erreurs importantes de failles de sécurité telles que la publication de secrets (par exemple clé api ou mot de passe) sur git/github, injection SQL dans le code, injection de code sur un serveur ou secret stocké en clair dans la base de données (non haché).
 
-            Le compte rendu dois être formaté en markdown. Chaque point important doit comporter un note (venant du barème), un titre en gras puis une explication avec des détails. Exemple :
-            ```
-            :rv_eliminatory: **Injection SQL dans les requêtes serveur** : Les requêtes SQL n'ont pas été préparé sur le serveur, les requêtes sont directement executé, menant à des injection de code SQL, pouvait détruire la base de données.
-            ```
-            Enfin, tu termines par une conclusion et le verdict.
+          Le compte rendu dois être formaté en markdown. Chaque point important doit comporter un note (venant du barème), un titre en gras puis une explication avec des détails. Exemple :
+          ```
+          :rv_eliminatory: **Injection SQL dans les requêtes serveur** : Les requêtes SQL n'ont pas été préparé sur le serveur, les requêtes sont directement executé, menant à des injection de code SQL, pouvait détruire la base de données.
+          ```
+          Enfin, tu termines par une conclusion et le verdict.
 
-            Dans la discussion du jury, chaque message commence par `#####`, suivi du nom du jury qui écrit puis de la date d'envoi du message et enfin le contenu du message.
-        - role: user
-          content: $input
+          Dans la discussion du jury, chaque message commence par `#####`, suivi du nom du jury qui écrit puis de la date d'envoi du message et enfin le contenu du message.
+      - role: user
+        content: $input
+      - role: assistant
+    parameters:
+      temperature: 0.7 
+      top-p: 1.0 
+      frequency-penalty: 0 
+      presence-penalty: 0 
+      max-tokens: 1000
+local:
+  models:
+    - name: openhermes
+      path: 'E:\AI\LM Studio\models\TheBloke\OpenHermes-2.5-Mistral-7B-GGUF\openhermes-2.5-mistral-7b.Q6_K.gguf'
+      template: chatml
       parameters:
-        temperature: 0.7 
-        top-p: 1.0 
-        frequency-penalty: 0 
-        presence-penalty: 0 
-        max-tokens: 1000
+        n_gpu_layers: 32
+    - name: mixtral
+      path: 'E:\AI\LM Studio\models\TheBloke\Mixtral-8x7B-Instruct-v0.1-GGUF\mixtral-8x7b-instruct-v0.1.Q4_K_M.gguf'
+      template: chatml
+      parameters:
+        n_gpu_layers: 8 # My 2080Ti dies if I load too much layers in the GPU 😅
+        use_mmap: true
+    - name: llama3
+      path: 'E:\AI\LM Studio\models\lmstudio-community\Meta-Llama-3-8B-Instruct-GGUF\Meta-Llama-3-8B-Instruct-Q5_K_M.gguf'
+      template: llama3
+      parameters:
+        n_gpu_layers: 32
+    - name: lexi
+      path: 'E:\AI\LM Studio\models\Orenguteng\Llama-3-8B-Lexi-Uncensored-GGUF\Lexi-Llama-3-8B-Uncensored_Q5_K_M.gguf'
+      template: llama3
+      parameters:
+        n_gpu_layers: 32
+endpoints:
+  ollama: "http://127.0.0.1:11434/v1"
