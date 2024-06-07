@@ -1,11 +1,9 @@
 # Merge a list of records
 export def "list merge" []: list<record> -> record {
-    let list = $in
-    mut result = {}
-    for $obj in $list {
-        $result = ($result | merge $obj)
-    }
-    $result
+    $in
+        | reduce --fold {} {|it acc| 
+            $acc | merge $it
+        }
 }
 
 # Filter fields name by predicate
@@ -28,7 +26,8 @@ export def "filter-name text" [
     --regex(-r)     # Match by regex
 ]: record -> record {
     let obj = $in
-    $obj | filter-name predicate { not ($in | (if $regex {find -r $filter} else {find $filter})  | is-empty) }
+    let find_args = ([(if $regex {"-r"} else {null}) $filter] | compact)
+    $obj | filter-name predicate { not ($in | find ...$find_args  | is-empty) }
 }
 
 # Filter fields value by predicate
@@ -43,6 +42,13 @@ export def "filter-value predicate" [
             { $input: ($obj_input | get $input) } 
         }
         | list merge
+}
+
+export def "into list" [] {
+    let obj = $in
+    $obj
+        | columns
+        | each {|it| {key: $it value: ($obj | get $it)} }
 }
 
 #[test]
@@ -66,4 +72,9 @@ def test_record_filtername_text [] {
 def test_record_filtervalue_predicate [] {
     use std assert
     assert equal ({aa:1 ab:2 ba:3 bb:4 ca:5 cb:6} | filter-value predicate { $in mod 2 == 0 }) {ab:2 bb:4 cb:6}
+}
+#[test]
+def test_record_into_list [] {
+    use std assert
+    assert equal ({aa:1 ab:2 ba:3} | into list) [{key:aa value:1} {key:ab value:2} {key:ba value:3}]
 }
