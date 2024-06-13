@@ -160,7 +160,8 @@ let dark_theme = {
     shape_float: purple_bold
     shape_range: yellow_bold
     shape_internalcall: cyan_bold
-    shape_external: cyan
+    shape_external: { fg: "#ff8000" attr: b }
+    shape_external_resolved: yellow_bold
     shape_externalarg: green_bold
     shape_literal: blue
     shape_operator: yellow
@@ -213,7 +214,8 @@ let light_theme = {
     shape_float: purple_bold
     shape_range: yellow_bold
     shape_internalcall: cyan_bold
-    shape_external: cyan
+    shape_external: { fg: "#ff8000" attr: b }
+    shape_external_resolved: yellow_bold
     shape_externalarg: green_bold
     shape_literal: blue
     shape_operator: yellow
@@ -296,6 +298,7 @@ $env.config = {
     metric: true # true => KB, MB, GB (ISO standard), false => KiB, MiB, GiB (Windows standard)
     format: "auto" # b, kb, kib, mb, mib, gb, gib, tb, tib, pb, pib, eb, eib, zb, zib, auto
   }
+  highlight_resolved_externals: true
   color_config: $dark_theme   # if you want a light theme, replace `$dark_theme` to `$light_theme`
   use_grid_icons: true
   footer_mode: "25" # always, never, number_of_rows, auto
