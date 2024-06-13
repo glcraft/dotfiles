@@ -1,0 +1,3 @@
+return {
+  "LhKipp/nvim-nu",
+}
