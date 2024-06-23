@@ -237,26 +237,31 @@ let light_theme = {
     shape_matching_brackets: { attr: u }
 }
 
-let xmake_completer = {|spans| 
-  XMAKE_SKIP_HISTORY=1 XMAKE_ROOT=y xmake lua 'private.utils.complete' 0 'nospace-json' ...$spans | from json | sort-by value
-}
-let xrepo_completer = {|spans| 
-  XMAKE_SKIP_HISTORY=1 XMAKE_ROOT=y xmake lua 'private.xrepo.complete' 0 'nospace-json' ...$spans | from json | sort-by value
-}
-let carapace_completer = {|spans| 
-  carapace $spans.0 nushell ...$spans | from json
-}
+
 let external_completer = {|spans| 
-  
-  {
-    $spans.0: $carapace_completer
+  mut completers = {}
+  if (which carapace | is-not-empty) {
+    let carapace_completer = {|self_spans| 
+      carapace $self_spans.0 nushell ...$self_spans | from json
+    }
+    $completers = { $spans.0: $carapace_completer }
   }
-    | merge {
-      xmake: $xmake_completer
-      xrepo: $xrepo_completer
-    } 
-    | get ($spans.0) 
-    | each {|it| do $it $spans}
+  if (which xmake | is-not-empty) {
+    let xmake_completer = {|self_spans| 
+      XMAKE_SKIP_HISTORY=1 XMAKE_ROOT=y xmake lua 'private.utils.complete' 0 'nospace-json' ...$self_spans | from json | sort-by value
+    }
+    let xrepo_completer = {|self_spans| 
+      XMAKE_SKIP_HISTORY=1 XMAKE_ROOT=y xmake lua 'private.xrepo.complete' 0 'nospace-json' ...$self_spans | from json | sort-by value
+    }
+    $completers = ($completers | merge { xmake: $xmake_completer xrepo: $xrepo_completer })
+  }
+  if (which dotnet | is-not-empty) {
+    let dotnet_completer = {|self_spans| 
+      dotnet complete ...($self_spans | skip 1) | lines
+    }
+    $completers = ($completers | merge { dotnet: $dotnet_completer })
+  }
+  $completers | get $spans.0 | each {|it| do $it $spans}
 }
 
 
