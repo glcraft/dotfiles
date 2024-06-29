@@ -257,7 +257,7 @@ let external_completer = {|spans|
   }
   if (which dotnet | is-not-empty) {
     let dotnet_completer = {|self_spans| 
-      dotnet complete ...($self_spans | skip 1) | lines
+      dotnet complete ($self_spans | skip 1 | str join " ") | lines
     }
     $completers = ($completers | merge { dotnet: $dotnet_completer })
   }
