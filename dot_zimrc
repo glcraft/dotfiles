@@ -55,4 +55,4 @@ zmodule zsh-users/zsh-autosuggestions
 # }}} End configuration added by Zim install
 
 # Use powerlevel10k theme
-zmodule romkatv/powerlevel10k --use degit
+# zmodule romkatv/powerlevel10k --use degit
