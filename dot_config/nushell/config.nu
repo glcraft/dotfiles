@@ -237,14 +237,13 @@ let light_theme = {
     shape_matching_brackets: { attr: u }
 }
 
-
-let external_completer = {|spans| 
+$env.COMPLETERS = do {
   mut completers = {}
   if (which carapace | is-not-empty) {
     let carapace_completer = {|self_spans| 
       carapace $self_spans.0 nushell ...$self_spans | from json
     }
-    $completers = { $spans.0: $carapace_completer }
+    $completers = $completers | merge { _: $carapace_completer }
   }
   if (which xmake | is-not-empty) {
     let xmake_completer = {|self_spans| 
@@ -257,11 +256,18 @@ let external_completer = {|spans|
   }
   if (which dotnet | is-not-empty) {
     let dotnet_completer = {|self_spans| 
-      dotnet complete ...($self_spans | skip 1) | lines
+      dotnet complete ($self_spans | skip 1 | str join " ") | lines
     }
     $completers = ($completers | merge { dotnet: $dotnet_completer })
   }
-  $completers | get $spans.0 | each {|it| do $it $spans}
+  $completers
+}
+
+let external_completer = {|spans| 
+  let completer = $env.COMPLETERS | get -i $spans.0 | default ($env.COMPLETERS | get -i "_")
+  if ($completer | is-not-empty) {
+    do $completer $spans
+  }
 }
 
 
@@ -355,6 +361,18 @@ $env.config = {
     }
     display_output: {
       if (term size).columns >= 100 { table -e } else { table }
+    }
+  }
+  plugins: {
+    explore: {
+      keybindings: {
+        navigation: {
+          left: 'left',
+          down: 'down',
+          up: 'up',
+          right: 'right',
+          }
+      }
     }
   }
   menus: [
@@ -589,3 +607,5 @@ alias ? = aio -e openai:command --run ask
 alias ?? = aio -e openai:ask
 
 alias fzf-code = fzf --preview "bat --color=always --style=numbers --line-range=:500 {}"
+
+alias ex = nu_plugin_explore
