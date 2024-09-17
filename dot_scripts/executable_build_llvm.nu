@@ -12,9 +12,9 @@ def main [] {
     enter $build_dir
     
     # Définir des variables en fonction du système d'exploitation
-    let ismac = ((sys | get host.name) == 'Darwin')
+    let ismac = ((sys host | get name) == 'Darwin')
     
-    let args = [
+    mut args = [
         '-DCMAKE_BUILD_TYPE=Release',
         $'-DCMAKE_INSTALL_PREFIX=($install_dir)',
         '-DLIBCXX_ENABLE_INCOMPLETE_FEATURES=ON',
@@ -28,10 +28,10 @@ def main [] {
         '-DLLVM_LINK_LLVM_DYLIB=ON'
         ]
     if $ismac {
-        $args += [
+        $args ++= [
             '-DLLVM_CREATE_XCODE_TOOLCHAIN=ON',
             '-DCMAKE_OSX_SYSROOT=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk',
-            $'-DCMAKE_OSX_ARCHITECTURES=($nu.os-info.arch)'
+            $'-DCMAKE_OSX_ARCHITECTURES=($nu.os-info.arch | str replace aarch arm)'
         ]
     }
     
