@@ -63,10 +63,12 @@ $env.NU_PLUGIN_DIRS = [
 # get path env var from other shells
 if $nu.os-info.name != "windows" {
     $env.PATH = (zsh -l -c 'echo $PATH' 
-    | split row (char esep) 
-    | prepend [
-        '/Users/gly/.local/bin'
-        '/opt/homebrew/bin'
-    ] | uniq)
+        | split row (char esep) 
+        | prepend [
+            '/Users/gly/.local/bin'
+            '/opt/homebrew/bin'
+        ] | uniq)
 }
-
+if $nu.os-info.name == "macos" {
+    $env.TOOLCHAINS = ls -s /Users/gly/Library/Developer/Toolchains/ | get name | sort | last | path parse | get stem
+}
