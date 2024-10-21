@@ -608,3 +608,7 @@ alias ?? = aio -e openai:ask
 alias fzf-code = fzf --preview "bat --color=always --style=numbers --line-range=:500 {}"
 
 alias ex = nu_plugin_explore
+
+if not (which fastfetch | is-empty) {
+  fastfetch
+}
