@@ -35,7 +35,33 @@ else
 end
 
 -- bind move to m for down and M for up in normal and visual mode
-vim.keymap.set("n", "M", "ddkP")
-vim.keymap.set("n", "m", "ddp")
--- vim.keymap.set("v", "M", "dkp")
--- vim.keymap.set("v", "m", "dp")
+local function move_selection(direction)
+  local count = vim.v.count1
+  if vim.fn.mode() == "v" or vim.fn.mode() == "V" then
+    -- Étendre la sélection à des lignes complètes
+    vim.cmd("normal! gvV")
+    if direction == "up" then
+      vim.cmd("'<,'>move '<-" .. (count + 1))
+    else
+      vim.cmd("'<,'>move '>+" .. count)
+    end
+    -- Re-sélectionner les lignes déplacées
+    vim.cmd("normal! gv=gv")
+  else
+    -- Mode normal
+    if direction == "up" then
+      vim.cmd("move .-" .. (count + 1))
+    else
+      vim.cmd("move .+" .. count)
+    end
+    -- Réaligner la ligne
+    vim.cmd("normal! ==")
+  end
+end
+
+vim.keymap.set({ "n", "x" }, "<M-k>", function()
+  move_selection("up")
+end, { silent = true })
+vim.keymap.set({ "n", "x" }, "<M-j>", function()
+  move_selection("down")
+end, { silent = true })
