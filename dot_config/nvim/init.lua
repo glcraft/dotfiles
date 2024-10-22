@@ -21,6 +21,7 @@ require("neo-tree").setup({
 })
 
 require("user.reload-init")
+require("user.config")
 
 -- set color scheme from local time
 local time = vim.fn.localtime()
