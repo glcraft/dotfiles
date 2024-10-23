@@ -23,6 +23,11 @@ require("neo-tree").setup({
 require("user.reload-init")
 require("user.config")
 
+require("mini.splitjoin").setup()
+require("mini.move").setup()
+require("mini.surround").setup()
+require("mini.comment").setup()
+
 -- set color scheme from local time
 local time = vim.fn.localtime()
 local hours = math.floor(time / 60 / 60 % 24)
