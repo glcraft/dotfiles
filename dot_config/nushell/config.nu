@@ -237,6 +237,13 @@ let light_theme = {
     shape_matching_brackets: { attr: u }
 }
 
+let external_completer = {|spans| 
+  let completer = $env.COMPLETERS | get -i $spans.0 | default ($env.COMPLETERS | get -i "_")
+  if ($completer | is-not-empty) {
+    do $completer $spans
+  }
+}
+
 $env.COMPLETERS = do {
   mut completers = {}
   if (which carapace | is-not-empty) {
@@ -260,16 +267,24 @@ $env.COMPLETERS = do {
     }
     $completers = ($completers | merge { dotnet: $dotnet_completer })
   }
+  if (which chezmoi | is-not-empty) {
+    let chezmoi_completer = {|self_spans| 
+      let self_spans = $self_spans | skip 1
+      match ($self_spans | first) {
+        git => {
+          let count_skip = if ($self_spans | get -i 1 | default "" | $in == "--" ) {2} else {1}
+          let source_path = chezmoi source-path
+          let self_spans = ($self_spans | skip $count_skip | prepend [git -C $source_path])
+          do $external_completer ($self_spans)
+        },
+        add | rm => (ls -a ($self_spans | last) | get name),
+        _ => (chezmoi __complete ...$self_spans | lines | take until { $in =~ :\d } | each { split column "\t" value description } | flatten)
+      }
+    }
+    $completers = ($completers | merge { chezmoi: $chezmoi_completer })
+  }
   $completers
 }
-
-let external_completer = {|spans| 
-  let completer = $env.COMPLETERS | get -i $spans.0 | default ($env.COMPLETERS | get -i "_")
-  if ($completer | is-not-empty) {
-    do $completer $spans
-  }
-}
-
 
 # The default config record. This is where much of your global configuration is setup.
 $env.config = {
