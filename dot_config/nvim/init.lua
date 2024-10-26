@@ -1,73 +1,45 @@
--- bootstrap lazy.nvim, LazyVim and your plugins
-require("config.lazy")
+vim.g.base46_cache = vim.fn.stdpath "data" .. "/base46/"
+vim.g.mapleader = " "
 
-require("neo-tree").setup({
-  source_selector = {
-    winbar = true,
-    statusline = false,
-    sources = {
-      { source = "filesystem" },
-      { source = "buffers" },
-      { source = "git_status" },
-      { source = "document_symbols" },
-    },
-  },
-  sources = {
-    "filesystem",
-    "buffers",
-    "git_status",
-    "document_symbols",
-  },
-})
+-- set codeium value based on nushell's uname
+vim.g.codeium_os = vim.trim(vim.fn.system({ "nu", "-c", "uname | get operating-system" }))
+vim.g.codeium_arch = vim.trim(vim.fn.system({ "nu", "-c", "uname | get machine" }))
 
-require("user.reload-init")
-require("user.config")
+-- bootstrap lazy and all plugins
+local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
 
-require("mini.splitjoin").setup()
-require("mini.move").setup()
-require("mini.surround").setup()
-require("mini.comment").setup()
-
--- set color scheme from local time
-local time = vim.fn.localtime()
-local hours = math.floor(time / 60 / 60 % 24)
-vim.cmd("colorscheme vscode")
-if hours >= 10 and hours <= 17 then -- GMT time
-  -- vim.cmd("colorscheme catppuccin-latte")
-  vim.o.background = "light"
-else
-  -- vim.cmd("colorscheme catppuccin-mocha")
-  vim.o.background = "dark"
+if not vim.uv.fs_stat(lazypath) then
+  local repo = "https://github.com/folke/lazy.nvim.git"
+  vim.fn.system { "git", "clone", "--filter=blob:none", repo, "--branch=stable", lazypath }
 end
 
--- bind move to m for down and M for up in normal and visual mode
-local function move_selection(direction)
-  local count = vim.v.count1
-  if vim.fn.mode() == "v" or vim.fn.mode() == "V" then
-    -- Étendre la sélection à des lignes complètes
-    vim.cmd("normal! gvV")
-    if direction == "up" then
-      vim.cmd("'<,'>move '<-" .. (count + 1))
-    else
-      vim.cmd("'<,'>move '>+" .. count)
-    end
-    -- Re-sélectionner les lignes déplacées
-    vim.cmd("normal! gv=gv")
-  else
-    -- Mode normal
-    if direction == "up" then
-      vim.cmd("move .-" .. (count + 1))
-    else
-      vim.cmd("move .+" .. count)
-    end
-    -- Réaligner la ligne
-    vim.cmd("normal! ==")
-  end
-end
+vim.opt.rtp:prepend(lazypath)
 
-vim.keymap.set({ "n", "x" }, "<M-k>", function()
-  move_selection("up")
-end, { silent = true })
-vim.keymap.set({ "n", "x" }, "<M-j>", function()
-  move_selection("down")
-end, { silent = true })
+local lazy_config = require "configs.lazy"
+
+-- load plugins
+require("lazy").setup({
+  {
+    "NvChad/NvChad",
+    lazy = false,
+    branch = "v2.5",
+    import = "nvchad.plugins",
+  },
+
+  { import = "plugins" },
+}, lazy_config)
+
+-- load theme
+dofile(vim.g.base46_cache .. "defaults")
+dofile(vim.g.base46_cache .. "statusline")
+
+require "options"
+require "nvchad.autocmds"
+
+vim.schedule(function()
+  require "mappings"
+end)
+
+vim.opt.relativenumber = true
+
+-- require("mini.surround").setup()
