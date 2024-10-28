@@ -11,37 +11,51 @@ wk.add {
   desc = "Save the file",
 }
 wk.add {
+  "<leader>M",
+  "<cmd> Mason <cr>",
+  mode = { "n", "v" },
+  desc = "mason",
+  icon = ""
+}
+wk.add {
   "<leader>L",
   "<cmd> Lazy <cr>",
-  mode = { "n", "i", "v" },
+  mode = { "n", "v" },
   desc = "lazy.nvim",
   icon = ""
 }
 wk.add {
   "<leader>l",
   require("frameterm").make_display_shell_command("lazygit"),
-  mode = { "n", "i", "v" },
+  mode = { "n", "v" },
   desc = "lazygit",
   icon = "󰊢"
 }
 wk.add {
-  "<C-:>",
+  "<C-/>",
   "gcc",
   mode = { "n" },
   desc = "Toggle comment",
 }
 wk.add {
-  "<C-:>",
+  "<C-/>",
   "gc",
   mode = { "v" },
   desc = "Toggle comment",
 }
-
+-- vim.keymap.set( {"n"}, "<C-/>", "gcc")
 wk.add {
   "s",
   "<Nop>",
   group = "surround",
   -- noremap = true,
+}
+wk.add {
+  "<leader>fs",
+  require("frameterm").compare_with_saved,
+  mode = { "n", "v" },
+  desc = "Compare with saved",
+  -- icon = "󰊢"
 }
 -- map({ "n", "i", "v" }, "<C-s>", "<cmd> w <cr>")
 -- map({ "n", "i", "v" }, "<leader>L", "<cmd> Lazy <cr>", { desc = "󰊢 lazy.nvim" })

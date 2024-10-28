@@ -1,9 +1,7 @@
 vim.g.base46_cache = vim.fn.stdpath "data" .. "/base46/"
 vim.g.mapleader = " "
 
--- set codeium value based on nushell's uname
-vim.g.codeium_os = vim.trim(vim.fn.system({ "nu", "-c", "uname | get operating-system" }))
-vim.g.codeium_arch = vim.trim(vim.fn.system({ "nu", "-c", "uname | get machine" }))
+require("user.config")
 
 -- bootstrap lazy and all plugins
 local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
@@ -39,7 +37,3 @@ require "nvchad.autocmds"
 vim.schedule(function()
   require "mappings"
 end)
-
-vim.opt.relativenumber = true
-
--- require("mini.surround").setup()

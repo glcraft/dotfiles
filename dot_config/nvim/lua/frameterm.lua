@@ -17,7 +17,7 @@ M.display_shell_command = function(command)
   local buf = vim.api.nvim_create_buf(false, true)
   local dim = create_float()
   local win = vim.api.nvim_open_win(buf, true, vim.tbl_deep_extend("force", { relative = "editor", border = "single" }, dim))
-  vim.fn.termopen("lazygit", {
+  vim.fn.termopen(command, {
     buf = buf,
     detach = false,
     on_exit = function() vim.api.nvim_win_close(win, true) end
@@ -30,6 +30,28 @@ end
 
 M.make_display_shell_command = function(command)
   return function() M.display_shell_command(command) end
-end 
+end
+
+M.compare_with_saved = function()
+  local path = vim.api.nvim_buf_get_name(0)
+  if not vim.fn.filereadable(path) then
+    vim.notify("This is not a file", nil)-- "error")
+    return
+  end
+  local content = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+  local path_file_minus = os.tmpname()
+  local file_minus = io.open(path_file_minus, "w")
+  if file_minus == nil then
+    vim.notify("unable to write in a temporary file")
+    return
+  end
+  file_minus:write(table.concat(content, "\n"))
+  file_minus:close()
+  local delta_options = vim.g.DELTA_OPTIONS or ""
+  local cmd = "delta --paging=always " .. delta_options .. " '" .. path .. "' '" .. path_file_minus .. "'"
+  vim.notify("cmd compare: "..cmd)
+  M.display_shell_command(cmd)
+  os.remove(path_file_minus)
+end
 
 return M

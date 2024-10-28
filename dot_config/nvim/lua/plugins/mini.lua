@@ -1,19 +1,26 @@
 return {
   {
     "echasnovski/mini.surround",
+    opts = {},
+    lazy = false,
     version = false,
-    config = function() require("mini.surround").setup() end
   },
   {
     "echasnovski/mini.move",
+    opts = {},
+    lazy = false,
     version = false,
   },
   {
     "echasnovski/mini.comment",
+    opts = {},
+    lazy = false,
     version = false,
   },
   {
     "echasnovski/mini.splitjoin",
+    opts = {},
+    lazy = false,
     version = false,
   },
 }

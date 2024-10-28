@@ -35,6 +35,7 @@ M.nvdash = {
     { txt = "󱥚  Themes", keys = "th", cmd = ":lua require('nvchad.themes').open()" },
     { txt = "  Mappings", keys = "ch", cmd = "NvCheatsheet" },
     { txt = "  Config", keys = "cc", cmd = "cd ~/.config/nvim/ | Telescope find_files" },
+    { txt = "  lazy.nvim", keys = "l", cmd = "Lazy" },
     { txt = "󰅙  Quit", keys = "q", cmd = "quit" },
 
     { txt = "─", hl = "NvDashLazy", no_gap = true, rep = true },
