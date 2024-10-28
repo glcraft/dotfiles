@@ -38,10 +38,18 @@ M.make_display_shell_command = function(command)
   return function() M.display_shell_command(command) end
 end
 
+local function is_buf_edited(buf)
+  return vim.api.nvim_get_option_value("modified", {buf = buf})
+end
+
 M.compare_with_saved = function()
   local path = vim.api.nvim_buf_get_name(0)
   if not vim.fn.filereadable(path) then
     vim.notify("This is not a file", nil)-- "error")
+    return
+  end
+  if not is_buf_edited(0) then
+    vim.notify("Buffer is not edited", nil)-- "error")
     return
   end
   local content = vim.api.nvim_buf_get_lines(0, 0, -1, false)
