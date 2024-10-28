@@ -13,14 +13,20 @@ local function create_float()
   return opts
 end
 
-M.display_shell_command = function(command)
+M.display_shell_command = function(command, opts)
   local buf = vim.api.nvim_create_buf(false, true)
   local dim = create_float()
   local win = vim.api.nvim_open_win(buf, true, vim.tbl_deep_extend("force", { relative = "editor", border = "single" }, dim))
+  local on_exit = function ()
+    if opts and opts.on_exit then
+      opts.on_exit()
+    end
+    vim.api.nvim_win_close(win, true)
+  end
   vim.fn.termopen(command, {
     buf = buf,
     detach = false,
-    on_exit = function() vim.api.nvim_win_close(win, true) end
+    on_exit = on_exit,
   })
   vim.wo[win].number = false
   vim.wo[win].relativenumber = false
@@ -50,8 +56,9 @@ M.compare_with_saved = function()
   local delta_options = vim.g.DELTA_OPTIONS or ""
   local cmd = "delta --paging=always " .. delta_options .. " '" .. path .. "' '" .. path_file_minus .. "'"
   vim.notify("cmd compare: "..cmd)
-  M.display_shell_command(cmd)
-  os.remove(path_file_minus)
+  M.display_shell_command(cmd, {
+    on_exit = function() os.remove(path_file_minus) end
+  })
 end
 
 return M
