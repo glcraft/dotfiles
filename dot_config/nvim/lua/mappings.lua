@@ -68,7 +68,13 @@ wk.add({
     "<cmd>Neotree toggle<cr>",
     mode = { "n", "v" },
     desc = "Toggle Neo-Tree",
-  }
+  },
+  {
+    "<f12>",
+    "<cmd>Definitions<cr>",
+    mode = { "n", "v" },
+    desc = "Show definitions",
+  },
 })
 
 wk.add({
@@ -91,7 +97,7 @@ wk.add({
 wk.add({
   "<leader>l",
   group = "LSP",
-  { "<leader>ld", "<cmd>Definitions<cr>", desc = "Symbol ddefinitions" },
+  { "<leader>ld", "<cmd>Definitions<cr>", desc = "Show definitions" },
   { "<leader>lr", "<cmd>References<cr>", desc = "Show references" },
   { "<leader>lc", "<cmd>CodeActions<cr>", desc = "Show code action" },
   { "<leader>ls", "<cmd>DocumentSymbols<cr>", desc = "Show document symbols" },
