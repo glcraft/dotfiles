@@ -25,4 +25,8 @@ return {
       { "nushell/tree-sitter-nu" }
     }
   },
+  {
+    "nvim-tree/nvim-tree.lua",
+    enabled = false
+  },
 }

@@ -23,4 +23,8 @@ return {
     lazy = false,
     version = false,
   },
+  {
+    'echasnovski/mini.ai',
+    version = false
+  }
 }

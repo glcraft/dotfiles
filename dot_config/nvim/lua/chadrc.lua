@@ -63,4 +63,26 @@ M.term = {
   }
 }
 
+local function getNeoTreeWidth()
+  local api = vim.api
+  for _, win in pairs(api.nvim_tabpage_list_wins(0)) do
+    if vim.bo[api.nvim_win_get_buf(win)].ft == "neo-tree" then
+      return api.nvim_win_get_width(win) + 1
+    end
+  end
+  return 0
+end
+
+M.ui = {
+   tabufline = {
+     order = { "neotreeOffset", "buffers", "tabs", "btns" },
+     modules = {
+       neotreeOffset = function()
+          return "%#NeoTreeNormal#" .. string.rep(" ", getNeoTreeWidth())
+       end,
+     }
+   }
+ }
+
+
 return M
