@@ -72,3 +72,5 @@ if $nu.os-info.name != "windows" {
 if $nu.os-info.name == "macos" {
     $env.TOOLCHAINS = ls -s /Users/gly/Library/Developer/Toolchains/ | get name | sort | last | path parse | get stem
 }
+$env.FZF_DEFAULT_COMMAND = 'fd --type file --hidden --no-ignore'
+$env.SKIM_DEFAULT_COMMAND = 'fd --type file --hidden --no-ignore'
