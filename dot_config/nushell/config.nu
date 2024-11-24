@@ -617,12 +617,18 @@ use ~/.scripts/record.nu
 
 use std
 
-alias ? = aio -e openai:command --run ask
-alias ?? = aio -e openai:ask
+# alias ? = aio -e openai:command --run ask
+# alias ?? = aio -e openai:ask
 
 alias fzf-code = fzf --preview "bat --color=always --style=numbers --line-range=:500 {}"
+# skim files
+alias skf = sk --ansi --preview "bat --color=always --style=numbers --line-range=:500 {}"
 
 alias ex = nu_plugin_explore
+
+# if (which hx | is-empty) and not (which helix | is-empty) {
+  alias hx = helix
+# }
 
 if not (which fastfetch | is-empty) {
   fastfetch

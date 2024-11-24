@@ -73,8 +73,8 @@ if $nu.os-info.name == "macos" {
     $env.TOOLCHAINS = ls -s /Users/gly/Library/Developer/Toolchains/ | get name | sort | last | path parse | get stem
 }
 
-$env.FZF_DEFAULT_COMMAND = 'fd --type file'
-$env.SKIM_DEFAULT_COMMAND = 'fd --type file'
+$env.FZF_DEFAULT_COMMAND = 'fd --color=always --type file --hidden --exclude node_modules --exclude .git'
+$env.SKIM_DEFAULT_COMMAND = $env.FZF_DEFAULT_COMMAND
 
 $env.EDITOR = 'helix'
 $env.GIT_PAGER = 'delta'
