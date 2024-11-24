@@ -1,0 +1,8 @@
+theme = "adwaita-dark"
+
+[editor]
+shell = ["nu", "-c"]
+line-number = "relative"
+
+[editor.cursor-shape]
+insert = "bar"
