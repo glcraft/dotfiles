@@ -626,9 +626,15 @@ alias skf = sk --ansi --preview "bat --color=always --style=numbers --line-range
 
 alias ex = nu_plugin_explore
 
-# if (which hx | is-empty) and not (which helix | is-empty) {
-  alias hx = helix
-# }
+def hx [...rest] {
+  if (which hx | is-empty) and not (which helix | is-empty) {
+    helix ...$rest
+  } else {
+    ^hx ...$rest
+  }
+}
+
+alias zj = zellij -l welcome
 
 if not (which fastfetch | is-empty) {
   fastfetch
