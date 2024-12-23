@@ -122,6 +122,32 @@ module completions {
     --verbose(-v)                                   # be more verbose
     --help                                          # Display the help message for this command
   ]
+
+  def "nu-complete git generate gitignore" [] {
+    if (stor open | schema | get tables | columns | where $in == nu_complete_gitignore | is-empty) {
+      stor create -t nu_complete_gitignore -c {value:str description:str}
+      http get "https://www.toptal.com/developers/gitignore/dropdown/templates.json" | each {|obj| {value: $obj.id description: $obj.text} } | stor insert -t nu_complete_gitignore
+    }
+    stor open | query db "select * from nu_complete_gitignore"
+  }
+
+  export def "git generate gitignore" [
+    --force 
+    --path: string
+    ...langs: string@"nu-complete git generate gitignore"
+  ] {
+    let path = $path | default ".gitignore"
+    if ($path | path exists) {
+      if $force {
+        rm -f $path
+      } else {
+        raise error $"\"($path)\" already exists. add --force to override it."
+      }
+    }
+
+    http get $"https://www.toptal.com/developers/gitignore/api/($langs | str join ',')" | save $path
+  }
+
 }
 
 # Get just the extern definitions without the custom completion commands
@@ -639,3 +665,5 @@ alias zj = zellij -l welcome
 if not (which fastfetch | is-empty) {
   fastfetch
 }
+
+
