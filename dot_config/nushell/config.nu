@@ -347,8 +347,7 @@ $env.config = {
     }
   }
   filesize: {
-    metric: true # true => KB, MB, GB (ISO standard), false => KiB, MiB, GiB (Windows standard)
-    format: "auto" # b, kb, kib, mb, mib, gb, gib, tb, tib, pb, pib, eb, eib, zb, zib, auto
+    unit: metric
   }
   highlight_resolved_externals: true
   color_config: $dark_theme   # if you want a light theme, replace `$dark_theme` to `$light_theme`
