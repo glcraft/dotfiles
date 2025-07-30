@@ -144,3 +144,6 @@ if which atuin >/dev/null 2>&1; then
   fi
 fi
 [ -f ~/.scripts/init_jdk.sh ] && source ~/.scripts/init_jdk.sh
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/gly/.cache/lm-studio/bin"

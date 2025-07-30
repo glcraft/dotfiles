@@ -1,3 +1,32 @@
+# [[language]]
+# name = "*"
+# language-servers = ["lsp-ai"]
+
+# [[language]]
+# name = "rust"
+# language-servers = ["rust-analyzer", "lsp-ai"]
+
+[[language]]
+name = "markdown"
+language-servers = ["typos"]
+
+[[language]]
+name = "nu"
+language-servers = ["nu-lsp", "lsp-ai"]
+# [[language]]
+# name = "text"
+# language-servers = ["typos"]
+
+[language-server.typos]
+# typos-lsp must be on your PATH, or otherwise change this to an absolute path to typos-lsp
+command = "typos-lsp"
+# Logging level of the language server. Defaults to error.
+# Run with helix -v to output LSP logs to the editor log (:log-open)
+environment = {"RUST_LOG" = "error"}
+
+[language-server.lsp-ai]
+command = "lsp-ai"
+
 [[grammar]]
 name = "nu"
 source = { git = "https://github.com/nushell/tree-sitter-nu", rev = "fa2f2d0ce15998e70bed3546e55cefa5ac4fb4df" }

@@ -3,6 +3,16 @@ theme = "adwaita-dark"
 [editor]
 shell = ["nu", "-c"]
 line-number = "relative"
+popup-border = "all"
+cursorline = true
+end-of-line-diagnostics = "hint"
+
+[editor.inline-diagnostics]
+cursor-line = "error"
 
 [editor.cursor-shape]
 insert = "bar"
+
+[editor.lsp]
+display-inlay-hints = true
+

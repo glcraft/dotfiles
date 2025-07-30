@@ -264,7 +264,7 @@ let light_theme = {
 }
 
 let external_completer = {|spans| 
-  let completer = $env.COMPLETERS | get -i $spans.0 | default ($env.COMPLETERS | get -i "_")
+  let completer = $env.COMPLETERS | get -o $spans.0 | default ($env.COMPLETERS | get -o "_")
   if ($completer | is-not-empty) {
     do $completer $spans
   }
@@ -298,7 +298,7 @@ $env.COMPLETERS = do {
       let self_spans = $self_spans | skip 1
       match ($self_spans | first) {
         git => {
-          let count_skip = if ($self_spans | get -i 1 | default "" | $in == "--" ) {2} else {1}
+          let count_skip = if ($self_spans | get -o 1 | default "" | $in == "--" ) {2} else {1}
           let source_path = chezmoi source-path
           let self_spans = ($self_spans | skip $count_skip | prepend [git -C $source_path])
           do $external_completer ($self_spans)
@@ -651,6 +651,8 @@ alias skf = sk --ansi --preview "bat --color=always --style=numbers --line-range
 
 alias ex = nu_plugin_explore
 
+alias hxd = ~/.cargo/bin/hx
+
 def hx [...rest] {
   if (which hx | is-empty) and not (which helix | is-empty) {
     helix ...$rest
@@ -664,5 +666,3 @@ alias zj = zellij -l welcome
 if not (which fastfetch | is-empty) {
   fastfetch
 }
-
-

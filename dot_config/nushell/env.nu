@@ -76,5 +76,7 @@ if $nu.os-info.name == "macos" {
 $env.FZF_DEFAULT_COMMAND = 'fd --color=always --type file --hidden --exclude node_modules --exclude .git'
 $env.SKIM_DEFAULT_COMMAND = $env.FZF_DEFAULT_COMMAND
 
-$env.EDITOR = 'helix'
+$env.EDITOR = 'hx'
 $env.GIT_PAGER = 'delta'
+source "~/.cargo/env.nu"
+$env.PATH = $env.PATH | prepend /Applications/WezTerm.app/Contents/MacOS
