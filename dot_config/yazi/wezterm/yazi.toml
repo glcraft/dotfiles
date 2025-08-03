@@ -1,0 +1,9 @@
+# TODO: copy file path on shortcut
+# TODO: open file on helix with wezterm
+[opener]
+edit = [
+  { run = "~/.config/yazi/wezterm/edit.nu $@", orphan = true }
+]
+[[open.rules]]
+mime = "text/*"
+use = "edit"
