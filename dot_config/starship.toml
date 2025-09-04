@@ -12,6 +12,7 @@ $c\
 $git_branch\
 $git_status\
 $time\
+$battery\
 $cmd_duration\
 [\ue0b4](fg:#444444)\
 \n\
@@ -91,6 +92,24 @@ disabled = false
 time_format = "%R" # Hour:Minute Format
 style = "fg:#B5BEFF bg:#444444"
 format = '[  $time ]($style)'
+
+[battery]
+disabled = false
+format = '[ $symbol$percentage ]($style)'
+
+[[battery.display]]
+threshold = 100
+style = "fg:green bg:#444444"
+[[battery.display]]
+threshold = 50
+style = "fg:yellow bg:#444444"
+[[battery.display]]
+threshold = 20
+style = "fg:orange bg:#444444"
+[[battery.display]]
+threshold = 10
+style = "fg:red bg:#444444"
+
 
 [os]
 disabled = false
