@@ -12,18 +12,19 @@ local function make_ide(pane)
   local cwd = pane:get_current_working_dir()
   pane:split({
     cwd = cwd,
-    args = {"lazygit"},
-    direction = "Right",
-    size = 1/3
-  }):split({
-    cwd = cwd,
     args = {"yazi"},
     set_environment_variables = {
       HELIX_PANE = tostring(pane:pane_id()),
       YAZI_CONFIG_HOME = "~/.config/yazi/wezterm",
     },
+    size = 1/3,
+    direction = "Right",
+  }):split({
+    cwd = cwd,
+    args = {"lazygit"},
     direction = "Bottom",
   }):split({
+    args = {"nu", "-l"},
     cwd = cwd,
     direction = "Bottom"
   })
@@ -37,7 +38,7 @@ config.initial_rows = 28
 
 -- Appearance
 config.font_size = 12
-config.color_scheme = 'AdventureTime'
+config.color_scheme = 'Argonaut (Gogh)'
 config.font = wezterm.font 'JetBrainsMono Nerd Font'
 config.background = {
   {
