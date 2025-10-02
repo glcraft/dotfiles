@@ -1,0 +1,43 @@
+layout {
+  default_tab_template {
+    // the default zellij tab-bar and status bar plugins
+    pane size=1 borderless=true {
+      plugin location="zellij:tab-bar"
+    }
+    children
+    pane size=2 borderless=true {
+      plugin location="zellij:status-bar"
+    }
+  }
+  tab name="Editor" {
+    pane split_direction="vertical" {
+      pane {
+        name "helix"
+        command "helix"
+        args "."
+        focus true
+        size "66%"
+      }
+      pane split_direction="horizontal" {
+        pane stacked=true {
+          pane {
+            command "yazi"
+            env_vars {
+              YAZI_CONFIG_HOME "~/.config/yazi/zellij-ide"
+            }
+          }
+          pane command="lazygit" expanded=true
+        }
+        pane
+      }
+  }
+  tab name="Debugger" {
+    pane name="debugger"
+  }
+}
+plugins {
+  zjpane location="https://github.com/FuriouZz/zjpane/releases/download/v0.2.0/zjpane.wasm"
+}
+load_plugins {
+  zjpane
+}
