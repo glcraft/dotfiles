@@ -78,5 +78,5 @@ $env.SKIM_DEFAULT_COMMAND = $env.FZF_DEFAULT_COMMAND
 
 $env.EDITOR = 'hx'
 $env.GIT_PAGER = 'delta'
-source "~/.cargo/env.nu"
+source (if ("~/.cargo/env.nu" | path exists) {"~/.cargo/env.nu"} else  {null})
 $env.PATH = $env.PATH | prepend /Applications/WezTerm.app/Contents/MacOS

@@ -111,7 +111,8 @@ let light_theme = {
 }
 
 let external_completer = {|spans| 
-  let completer = $env.COMPLETERS | get -o $spans.0 | default ($env.COMPLETERS | get -o "_")
+let def = $env.COMPLETERS | get -o "_"
+  let completer = $env.COMPLETERS | get -o $spans.0 | default { $def }
   if ($completer | is-not-empty) {
     do $completer $spans
   }
