@@ -21,8 +21,9 @@ local function make_ide(pane)
     direction = "Right",
   }):split({
     cwd = cwd,
-    args = {"lazygit"},
+    args = {"/usr/bin/env", "lazygit"},
     direction = "Bottom",
+    size = 2/3,
   }):split({
     args = {"nu", "-l"},
     cwd = cwd,
@@ -40,18 +41,6 @@ config.initial_rows = 28
 config.font_size = 12
 config.color_scheme = 'Argonaut (Gogh)'
 config.font = wezterm.font 'JetBrainsMono Nerd Font'
-config.background = {
-  {
-    source = {File="/Users/gly/Pictures/Backgrounds/wp4615518-terminal-wallpapers.jpg"},
-    hsb = { brightness = 0.7 },
-  }
-}
-
-if utils.host_os == "macos" then
-  config.set_environment_variables = {
-    PATH = '/opt/homebrew/bin:' .. os.getenv('PATH')
-  }
-end
 
 -- Program launcher
 config.default_prog = {"/opt/homebrew/bin/nu", "-l"}
@@ -73,27 +62,39 @@ config.launch_menu = {
 config.keys = {}
 
 if utils.host_os == "macos" then
-  -- Home/End behavior on MacOS
-  table.insert(config.keys, {
-    key = 'LeftArrow',
-    mods = 'CMD',
-    action = wezterm.action { SendString = "\x1bOH" },
-  })
-  table.insert(config.keys, {
-    key = 'RightArrow',
-    mods = 'CMD',
-    action = wezterm.action { SendString = "\x1bOF" },
-  })
-  -- Delete whole line
-  table.insert(config.keys, {
-    key = 'Backspace',
-    mods = 'CMD',
-    action = wezterm.action { SendString = "\x15", },
-  })
+  config.set_environment_variables = {
+    PATH = '/opt/homebrew/bin:' .. os.getenv('PATH')
+  }
+  -- Set Background
+  config.background = {
+    {
+      source = {File="/Users/gly/Pictures/Backgrounds/wp4615518-terminal-wallpapers.jpg"},
+      hsb = { brightness = 0.7 },
+    }
+  }
 end
+local ctrl_key = utils.host_os == "macos" and 'CMD' or 'CTRL'
+  -- Home/End behavior shortcuts
+table.insert(config.keys, {
+  key = 'LeftArrow',
+  mods = ctrl_key,
+  action = wezterm.action { SendString = "\x1bOH" },
+})
+table.insert(config.keys, {
+  key = 'RightArrow',
+  mods = ctrl_key,
+  action = wezterm.action { SendString = "\x1bOF" },
+})
+-- Delete whole line
+table.insert(config.keys, {
+  key = 'Backspace',
+  mods = ctrl_key,
+  action = wezterm.action { SendString = "\x15", },
+})
+-- Instanciate IDE-like panes
 table.insert(config.keys, {
   key = 'J',
-  mods = 'CMD|SHIFT',
+  mods = ctrl_key .. '|SHIFT',
   action = wezterm.action_callback(function(win, pane)
     make_ide(pane)
   end)
@@ -135,9 +136,9 @@ wezterm.on('open-uri', function(window, pane, uri)
     end
     if action then
       window:perform_action(action, hx_pane)
+      return false
     end
   end
-  return false
 end)
 
 -- Finally, return the configuration to wezterm:
