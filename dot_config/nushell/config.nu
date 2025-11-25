@@ -109,7 +109,10 @@ let light_theme = {
     shape_nothing: light_cyan
     shape_matching_brackets: { attr: u }
 }
-
+####################################
+# Completions
+####################################
+use ./ollama_completions.nu *
 let external_completer = {|spans| 
 let def = $env.COMPLETERS | get -o "_"
   let completer = $env.COMPLETERS | get -o $spans.0 | default { $def }
