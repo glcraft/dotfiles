@@ -62,6 +62,7 @@ config.launch_menu = {
 config.keys = {}
 
 if utils.host_os == "macos" then
+  config.font_size = 13
   config.set_environment_variables = {
     PATH = '/opt/homebrew/bin:' .. os.getenv('PATH')
   }
