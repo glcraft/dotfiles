@@ -71,6 +71,7 @@ if $nu.os-info.name != "windows" {
 }
 if $nu.os-info.name == "macos" {
     $env.TOOLCHAINS = ls -s /Users/gly/Library/Developer/Toolchains/ | get name | sort | last | path parse | get stem
+    $env.VK_LAYER_PATH = "/opt/homebrew/opt/vulkan-validationlayers/share/vulkan/explicit_layer.d"
 }
 
 $env.FZF_DEFAULT_COMMAND = 'fd --color=always --type file --hidden --exclude node_modules --exclude .git'
