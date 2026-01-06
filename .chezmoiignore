@@ -1,0 +1,4 @@
+{{- if ne .chezmoi.os "linux" }}
+.config/plasma-org.kde.plasma.desktop-appletsrc
+.config/kglobalshortcutsrc
+{{- end }}
