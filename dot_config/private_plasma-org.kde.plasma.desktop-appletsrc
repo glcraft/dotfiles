@@ -77,7 +77,7 @@ plugin=org.kde.plasma.kicker
 
 [Containments][27][Applets][30][Configuration]
 PreloadWeight=100
-popupHeight=510
+popupHeight=550
 popupWidth=300
 
 [Containments][27][Applets][30][Configuration][General]
@@ -88,6 +88,7 @@ immutability=1
 plugin=org.kde.plasma.digitalclock
 
 [Containments][27][Applets][31][Configuration]
+PreloadWeight=55
 popupHeight=451
 popupWidth=560
 
@@ -135,7 +136,7 @@ immutability=1
 plugin=org.kde.plasma.volume
 
 [Containments][27][Applets][33][Applets][39][Configuration]
-PreloadWeight=85
+PreloadWeight=100
 
 [Containments][27][Applets][33][Applets][39][Configuration][General]
 migrated=true
@@ -143,6 +144,9 @@ migrated=true
 [Containments][27][Applets][33][Applets][40]
 immutability=1
 plugin=org.kde.plasma.devicenotifier
+
+[Containments][27][Applets][33][Applets][40][Configuration]
+PreloadWeight=100
 
 [Containments][27][Applets][33][Applets][41]
 immutability=1
@@ -179,11 +183,14 @@ immutability=1
 plugin=org.kde.plasma.brightness
 
 [Containments][27][Applets][33][Applets][47][Configuration]
-PreloadWeight=55
+PreloadWeight=41
 
 [Containments][27][Applets][33][Applets][48]
 immutability=1
 plugin=org.kde.plasma.battery
+
+[Containments][27][Applets][33][Applets][48][Configuration]
+PreloadWeight=26
 
 [Containments][27][Applets][33][Applets][49]
 immutability=1
@@ -197,7 +204,7 @@ immutability=1
 plugin=org.kde.plasma.bluetooth
 
 [Containments][27][Applets][33][Applets][50][Configuration]
-PreloadWeight=100
+PreloadWeight=97
 
 [Containments][27][Applets][33][General]
 extraItems=org.kde.plasma.manage-inputmethod,org.kde.plasma.vault,org.kde.plasma.bluetooth,org.kde.plasma.keyboardlayout,org.kde.plasma.clipboard,org.kde.plasma.cameraindicator,org.kde.plasma.volume,org.kde.plasma.devicenotifier,org.kde.plasma.printmanager,org.kde.plasma.mediacontroller,org.kde.kscreen,org.kde.plasma.notifications,org.kde.plasma.weather,org.kde.plasma.networkmanagement,org.kde.plasma.keyboardindicator,org.kde.plasma.battery,org.kde.plasma.brightness
@@ -223,7 +230,7 @@ DialogWidth=810
 [Containments][27][Applets][53][Configuration][Station]
 latitude=46.161224
 longitude=2.842825
-savedStations=[{"stationID":"ISAINT7583","address":"Saint-Éloy-les-Mines","latitude":46.16122,"longitude":2.84283,"selected":true}]
+savedStations=[{"stationID":"ISAINT7583","address":"Saint-Éloy-les-Mines","latitude":"46.161224","longitude":"2.842825","selected":true}]
 stationID=ISAINT7583
 stationName=Saint-Éloy-les-Mines
 
@@ -248,4 +255,4 @@ AppletOrder=30;28;51;53;33;54;31
 
 [ScreenMapping]
 itemsOnDisabledScreens=
-screenMapping=desktop:/steam.desktop,0,496ef816-3c8f-4056-8c05-e58b01445d37
+screenMapping=desktop:/PrimeHack,0,496ef816-3c8f-4056-8c05-e58b01445d37,desktop:/steam.desktop,0,496ef816-3c8f-4056-8c05-e58b01445d37
