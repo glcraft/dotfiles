@@ -16,3 +16,11 @@ insert = "bar"
 [editor.lsp]
 display-inlay-hints = true
 
+[keys.normal]
+F12 = "@gd"
+"C-A-up" = "@Xd<up>P"
+"C-A-down" = "@Xdp"
+
+[keys.select]
+"C-A-up" = "@Xd<up>P"
+"C-A-down" = "@Xdp"
