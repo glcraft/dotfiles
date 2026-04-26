@@ -10,9 +10,10 @@ local function make_ide(pane)
   --   end
   -- end
   local cwd = pane:get_current_working_dir()
+  wezterm.log_info(cwd)
   pane:split({
     cwd = cwd,
-    args = {"yazi"},
+    args = {"yazi", cwd.file_path},
     set_environment_variables = {
       HELIX_PANE = tostring(pane:pane_id()),
       YAZI_CONFIG_HOME = "~/.config/yazi/wezterm",
@@ -33,6 +34,7 @@ end
 
 local config = wezterm.config_builder()
 
+config.warn_about_missing_glyphs=false
 -- initial geometry for new windows
 config.initial_cols = 120
 config.initial_rows = 28
@@ -43,11 +45,14 @@ config.color_scheme = 'Argonaut (Gogh)'
 config.font = wezterm.font 'JetBrainsMono Nerd Font'
 
 -- Program launcher
-config.default_prog = {"/opt/homebrew/bin/nu", "-l"}
 config.launch_menu = {
   {
     label = "zsh",
     args = {"zsh", "-l"}
+  },
+  {
+    label = "Nushell",
+    args = {"nu", "-l"}
   },
   {
     label = "Bottom - Process manager",
@@ -62,7 +67,6 @@ config.launch_menu = {
 config.keys = {}
 
 if utils.host_os == "macos" then
-  config.font_size = 13
   config.set_environment_variables = {
     PATH = '/opt/homebrew/bin:' .. os.getenv('PATH')
   }
@@ -74,6 +78,21 @@ if utils.host_os == "macos" then
     }
   }
 end
+-- Change mouse scroll amount
+config.mouse_bindings = {
+  {
+    event = { Down = { streak = 1, button = { WheelUp = 1 } } },
+    mods = 'NONE',
+    action = wezterm.action.ScrollByLine(-3),
+    alt_screen = false,
+  },
+  {
+    event = { Down = { streak = 1, button = { WheelDown = 1 } } },
+    mods = 'NONE',
+    action = wezterm.action.ScrollByLine(3),
+    alt_screen = false,
+  },
+}
 local ctrl_key = utils.host_os == "macos" and 'CMD' or 'CTRL'
   -- Home/End behavior shortcuts
 table.insert(config.keys, {
@@ -141,6 +160,9 @@ wezterm.on('open-uri', function(window, pane, uri)
     end
   end
 end)
+
+local bar = wezterm.plugin.require("https://github.com/adriankarlen/bar.wezterm")
+bar.apply_to_config(config)
 
 -- Finally, return the configuration to wezterm:
 return config
