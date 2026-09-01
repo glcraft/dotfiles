@@ -18,6 +18,7 @@ display-inlay-hints = true
 
 [keys.normal]
 F12 = "@gd"
+F2 = "rename_symbol"
 "C-A-up" = "@Xd<up>P"
 "C-A-down" = "@Xdp"
 

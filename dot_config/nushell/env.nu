@@ -72,6 +72,8 @@ if $nu.os-info.name != "windows" {
 if $nu.os-info.name == "macos" {
     $env.TOOLCHAINS = ls -s /Users/gly/Library/Developer/Toolchains/ | get name | sort | last | path parse | get stem
     $env.VK_LAYER_PATH = "/opt/homebrew/opt/vulkan-validationlayers/share/vulkan/explicit_layer.d"
+    $env.PATH = $env.PATH | prepend /Applications/WezTerm.app/Contents/MacOS
+    $env.HELIX_RUNTIME = $"($env.HOME)/Projects/helix/runtime"
 }
 
 $env.FZF_DEFAULT_COMMAND = 'fd --color=always --type file --hidden --exclude node_modules --exclude .git'
@@ -80,4 +82,3 @@ $env.SKIM_DEFAULT_COMMAND = $env.FZF_DEFAULT_COMMAND
 $env.EDITOR = 'hx'
 $env.GIT_PAGER = 'delta'
 source (if ("~/.cargo/env.nu" | path exists) {"~/.cargo/env.nu"} else  {null})
-$env.PATH = $env.PATH | prepend /Applications/WezTerm.app/Contents/MacOS

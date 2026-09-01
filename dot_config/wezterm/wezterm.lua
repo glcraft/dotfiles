@@ -70,6 +70,7 @@ if utils.host_os == "macos" then
   config.set_environment_variables = {
     PATH = '/opt/homebrew/bin:' .. os.getenv('PATH')
   }
+  config.default_prog = { '/opt/homebrew/bin/nu', '-l' }
   -- Set Background
   config.background = {
     {
