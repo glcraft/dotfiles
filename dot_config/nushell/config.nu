@@ -204,9 +204,9 @@ $env.config = {
   color_config: $dark_theme   # if you want a light theme, replace `$dark_theme` to `$light_theme`
   footer_mode: 25 # always, never, number_of_rows, auto
   float_precision: 2
-  # buffer_editor: "emacs" # command that will be used to edit the current line buffer with ctrl+o, if unset fallback to $env.EDITOR and $env.VISUAL
+  buffer_editor: "helix" # command that will be used to edit the current line buffer with ctrl+o, if unset fallback to $env.EDITOR and $env.VISUAL
   use_ansi_coloring: true
-  edit_mode: emacs # emacs, vi
+  edit_mode: helix # emacs, vi, helix
   shell_integration: {
     # osc2 abbreviates the path if in the home_dir, sets the tab/window title, shows the running command in the tab/window title
     osc2: true
@@ -387,7 +387,7 @@ $env.config = {
       name: completion_menu
       modifier: none
       keycode: tab
-      mode: emacs # Options: emacs vi_normal vi_insert
+      mode: [emacs vi_insert helix_insert] # Options: emacs vi_normal vi_insert
       event: {
         until: [
           { send: menu name: completion_menu }
@@ -466,22 +466,52 @@ $env.config = {
       name: commands_menu
       modifier: control
       keycode: char_t
-      mode: [emacs, vi_normal, vi_insert]
+      mode: [emacs, vi_normal, vi_insert, helix_normal, helix_insert]
       event: { send: menu name: commands_menu }
     }
     {
       name: vars_menu
       modifier: alt
       keycode: char_o
-      mode: [emacs, vi_normal, vi_insert]
+      mode: [emacs, vi_normal, vi_insert, helix_normal, helix_insert]
       event: { send: menu name: vars_menu }
     }
     {
       name: commands_with_description
       modifier: control
       keycode: char_s
-      mode: [emacs, vi_normal, vi_insert]
+      mode: [emacs, vi_normal, vi_insert, helix_normal, helix_insert]
       event: { send: menu name: commands_with_description }
+    }
+    # Custom for helix
+    {
+      name: helix_backword
+      modifier: alt
+      keycode: backspace
+      mode: helix_insert
+      event: {
+        edit: BackspaceWord
+      }
+    }
+    {
+      name: helix_movebackword
+      modifier: alt
+      keycode: left
+      mode: helix_insert
+      event: {
+        edit: MoveWordLeft
+        select: false
+      }
+    }
+    {
+      name: helix_movefrontword
+      modifier: alt
+      keycode: right
+      mode: helix_insert
+      event: {
+        edit: MoveWordright
+        select: false
+      }
     }
   ]
 }
