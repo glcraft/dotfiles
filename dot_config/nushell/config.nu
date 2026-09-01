@@ -513,6 +513,13 @@ $env.config = {
         select: false
       }
     }
+    {
+      name: helix_deleteline
+      modifier: control
+      keycode: backspace
+      mode: helix_insert
+      event: {edit: cutfromlinestart}
+    }
   ]
 }
 
