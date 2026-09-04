@@ -509,8 +509,13 @@ $env.config = {
       keycode: right
       mode: helix_insert
       event: {
-        edit: MoveWordright
-        select: false
+        until: [
+          {send: HistoryHintWordComplete}
+          {
+            edit: MoveWordright
+            select: false
+          }
+        ]
       }
     }
     {
