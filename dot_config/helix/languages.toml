@@ -16,7 +16,7 @@ language-servers = ["nu-lsp", "lsp-ai"]
 # [[language]]
 # name = "text"
 # language-servers = ["typos"]
-
+#
 [language-server.typos]
 # typos-lsp must be on your PATH, or otherwise change this to an absolute path to typos-lsp
 command = "typos-lsp"
