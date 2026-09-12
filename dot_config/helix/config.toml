@@ -6,6 +6,17 @@ line-number = "relative"
 popup-border = "all"
 cursorline = true
 end-of-line-diagnostics = "hint"
+rainbow-brackets = true
+
+[editor.breadcrumb]
+enable = true
+# full: helix-term > src > commands > typed.rs > TypeableCommand > name
+# file: typed.rs > TypeableCommand > name
+# none: TypeableCommand > name
+path = "file"
+
+[editor.indent-guides]
+rainbow-indent = "dim"
 
 [editor.inline-diagnostics]
 cursor-line = "error"
@@ -25,3 +36,33 @@ F2 = "rename_symbol"
 [keys.select]
 "C-A-up" = "@Xd<up>P"
 "C-A-down" = "@Xdp"
+
+[icons.vcs]
+enable = true
+branch = "⌬"
+
+[icons.fs]
+enable = true
+
+[icons.fs.file.extension]
+rs = { glyph = "🦀", fg = "#FF0000" }
+
+[icons.fs.directory]
+".git" = ""
+
+[icons.diagnostic]
+warn = "▲"
+
+[icons.kind]
+enable = true
+color = "󰚍 "
+
+[icons.ui]
+workspace =  ""
+
+[icons.ui.statusline]
+separator = ""
+
+[icons.ui.virtual]
+indentation = "▏"
+ruler = "┊"

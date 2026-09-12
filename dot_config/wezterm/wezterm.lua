@@ -3,6 +3,8 @@ local wezterm = require 'wezterm'
 local utils = require 'utils'
 string.startswith = utils.string_startswith
 
+local helix_exe = utils.host_os == "macos" and "/Users/gly/.cargo/bin/hx" or "hx"
+
 local function make_ide(pane)
   -- local actions = {}
   -- for _, v_pane in ipairs(pane:tab():panes()) do
@@ -60,7 +62,7 @@ config.launch_menu = {
   },
   {
     label = "Helix",
-    args = { "hx" }
+    args = { helix_exe }
   }
 }
 
@@ -149,7 +151,7 @@ wezterm.on('open-uri', function(window, pane, uri)
       action = wezterm.action.SplitPane {
         direction = direction,
         command = {
-          args = { 'hx', uri:sub(8) },
+          args = { helix_exe, uri:sub(8) },
         },
       }
     else
