@@ -113,49 +113,49 @@ let light_theme = {
 # Completions
 ####################################
 use ./ollama_completions.nu *
-let external_completer = {|spans| 
-let def = $env.COMPLETERS | get -o "_"
-  let completer = $env.COMPLETERS | get -o $spans.0 | default { $def }
+let external_completer = {|place| 
+  let default_completer = $env.COMPLETERS | get -o "_"
+  let completer = $env.COMPLETERS | get -o ($place.command | first) | default { $default_completer }
   if ($completer | is-not-empty) {
-    do $completer $spans
+    do $completer $place
   }
 }
 
 $env.COMPLETERS = do {
   mut completers = {}
   if (which carapace | is-not-empty) {
-    let carapace_completer = {|self_spans| 
-      carapace $self_spans.0 nushell ...$self_spans | from json
+    let carapace_completer = {|place| 
+      carapace ($place.command | first) nushell ...$place.command | from json
     }
     $completers = $completers | merge { _: $carapace_completer }
   }
   if (which xmake | is-not-empty) {
-    let xmake_completer = {|self_spans| 
-      XMAKE_SKIP_HISTORY=1 XMAKE_ROOT=y xmake lua 'private.utils.complete' 0 'nospace-json' ...$self_spans | from json | sort-by value
+    let xmake_completer = {|place| 
+      XMAKE_SKIP_HISTORY=1 XMAKE_ROOT=y xmake lua 'private.utils.complete' 0 'nospace-json' ...$place.command | from json | sort-by value
     }
-    let xrepo_completer = {|self_spans| 
-      XMAKE_SKIP_HISTORY=1 XMAKE_ROOT=y xmake lua 'private.xrepo.complete' 0 'nospace-json' ...$self_spans | from json | sort-by value
+    let xrepo_completer = {|place| 
+      XMAKE_SKIP_HISTORY=1 XMAKE_ROOT=y xmake lua 'private.xrepo.complete' 0 'nospace-json' ...$place.command | from json | sort-by value
     }
     $completers = ($completers | merge { xmake: $xmake_completer xrepo: $xrepo_completer })
   }
   if (which dotnet | is-not-empty) {
-    let dotnet_completer = {|self_spans| 
-      dotnet complete ($self_spans | skip 1 | str join " ") | lines
+    let dotnet_completer = {|place| 
+      dotnet complete ($place.command | skip 1 | str join " ") | lines
     }
     $completers = ($completers | merge { dotnet: $dotnet_completer })
   }
   if (which chezmoi | is-not-empty) {
-    let chezmoi_completer = {|self_spans| 
-      let self_spans = $self_spans | skip 1
-      match ($self_spans | first) {
+    let chezmoi_completer = {|place| 
+      let command = $place.command | skip 1
+      match ($command | first) {
         git => {
-          let count_skip = if ($self_spans | get -o 1 | default "" | $in == "--" ) {2} else {1}
+          let count_skip = if ($command | get -o 1 | default "" | $in == "--" ) {2} else {1}
           let source_path = chezmoi source-path
-          let self_spans = ($self_spans | skip $count_skip | prepend [git -C $source_path])
-          do $external_completer ($self_spans)
+          let place = { command:($command | skip $count_skip | prepend [git -C $source_path]) }
+          do $external_completer $place
         },
-        add | rm => (ls -a ($self_spans | last) | get name),
-        _ => (chezmoi __complete ...$self_spans | lines | take until { $in =~ :\d } | each { split column "\t" value description } | flatten)
+        add | rm => ($command | last | ls -a $in | get name),
+        _ => (chezmoi __complete ...$command | lines | take until { $in like ':\d' } | each { split column "\t" value description } | flatten)
       }
     }
     $completers = ($completers | merge { chezmoi: $chezmoi_completer })
