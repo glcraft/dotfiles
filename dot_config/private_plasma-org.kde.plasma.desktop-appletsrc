@@ -4,8 +4,14 @@ RightButton;NoModifier=org.kde.contextmenu
 [ActionPlugins][1]
 RightButton;NoModifier=org.kde.contextmenu
 
+[AppletGlobals][dev.xarbit.appgrid.panel]
+appgridPopupHeight=570
+appgridPopupWidth=797
+
 [Containments][1]
+ItemGeometries-2752x1152=
 ItemGeometries-3440x1440=
+ItemGeometries-640x480=
 ItemGeometriesHorizontal=
 activityId=496ef816-3c8f-4056-8c05-e58b01445d37
 formfactor=0
@@ -14,6 +20,14 @@ lastScreen=0
 location=0
 plugin=org.kde.plasma.folder
 wallpaperplugin=org.kde.image
+
+[Containments][1][ConfigDialog]
+DialogHeight=630
+DialogWidth=810
+
+[Containments][1][Wallpaper][org.kde.image][General]
+Image=file:///usr/share/wallpapers/Next/
+SlidePaths=/usr/share/wallpapers/
 
 [Containments][2]
 activityId=
@@ -28,18 +42,6 @@ wallpaperplugin=org.kde.image
 immutability=1
 plugin=org.kde.plasma.showdesktop
 
-[Containments][2][Applets][3]
-immutability=1
-plugin=org.kde.plasma.kickoff
-
-[Containments][2][Applets][3][Configuration]
-PreloadWeight=100
-popupHeight=510
-popupWidth=677
-
-[Containments][2][Applets][3][Configuration][General]
-favoritesPortedToKAstats=true
-
 [Containments][2][Applets][4]
 immutability=1
 plugin=org.kde.plasma.pager
@@ -51,8 +53,32 @@ plugin=org.kde.plasma.icontasks
 [Containments][2][Applets][5][Configuration][General]
 launchers=applications:systemsettings.desktop,preferred://filemanager,applications:org.wezfurlong.wezterm.desktop,applications:org.kde.konsole.desktop,applications:zen.desktop
 
+[Containments][2][Applets][57]
+immutability=1
+plugin=dev.xarbit.appgrid.panel
+
+[Containments][2][Applets][57][Configuration]
+popupHeight=570
+popupSizeOwner=appgrid:797x570
+popupWidth=797
+
+[Containments][2][Applets][57][Configuration][ConfigDialog]
+DialogHeight=630
+DialogWidth=810
+
+[Containments][2][Applets][57][Configuration][General]
+favoritesPortedToKAstats=true
+headerActionsMigrated=true
+icon=start-here-kde-symbolic
+iconMigratedFrom17=true
+knownApps=A Pinball Game That Makes You Mad.desktop,org.kde.drkonqi.coredump.gui.desktop,android-studio.desktop,org.kde.ark.desktop,blender.desktop,org.kde.plasma-welcome.desktop,org.kde.kinfocenter.desktop,chromium.desktop,cmake-gui.desktop,systemsettings.desktop,nm-connection-editor.desktop,Deck of Treads Demo.desktop,discord.desktop,org.kde.discover.desktop,org.kde.dolphin.desktop,org.kde.kmenuedit.desktop,Effulgence RPG.desktop,io.element.Element.desktop,bssh.desktop,bvnc.desktop,avahi-discover.desktop,firefox.desktop,virt-manager.desktop,gpu-screen-recorder.desktop,Grand Theft Auto IV The Complete Edition.desktop,lstopo.desktop,Heaven Does Not Respond.desktop,helix.desktop,heroic.desktop,htop.desktop,ironwail.desktop,org.kde.kate.desktop,org.keepassxc.KeePassXC.desktop,org.kde.konsole.desktop,org.kde.kwrite.desktop,mpv.desktop,vlc.desktop,libreoffice-startcenter.desktop,libreoffice-base.desktop,libreoffice-calc.desktop,libreoffice-draw.desktop,libreoffice-impress.desktop,libreoffice-math.desktop,libreoffice-writer.desktop,looking-glass-client.desktop,Manifold Garden.desktop,MarkText.desktop,msty.desktop,msty-studio.desktop,nordvpn-gui.desktop,org.gnome.SimpleScan.desktop,com.obsproject.Studio.desktop,Outhold.desktop,Oxygen Not Included.desktop,org.moson.pacseek.desktop,Paragnosia.desktop,net.davidotek.pupgui2.desktop,qimgv.desktop,assistant.desktop,qdbusviewer.desktop,linguist.desktop,qv4l2.desktop,qvidcap.desktop,designer.desktop,Quake.desktop,org.remmina.Remmina.desktop,com.libretro.RetroArch.desktop,rquickshare.desktop,RQuickShare.desktop,org.kde.plasma.emojier.desktop,org.vinegarhq.Sober.desktop,org.kde.spectacle.desktop,Star Birds.desktop,steam.desktop,Super Meat Boy 3D Demo.desktop,SurrounDead.desktop,org.kde.plasma-systemmonitor.desktop,Tearscape.desktop,Terraria.desktop,They Left Us Here Demo.desktop,org.mozilla.Thunderbird.desktop,tModLoader.desktop,Trackmania.desktop,transmission-qt.desktop,Uncle Chop's Rocket Shop.desktop,Untrusted.desktop,vim.desktop,vkQuake.desktop,waterfox.desktop,org.wezfurlong.wezterm.desktop,Windows 11.desktop,YAPYAP.desktop,yazi.desktop,dev.zed.Zed.desktop,zellij.desktop,zen.desktop,com.github.wwmm.easyeffects.desktop,tux-manager.desktop,io.github.benapetr.TuxManager.desktop
+launchCounts=MarkText.desktop=1,android-studio.desktop=3,blender.desktop=2,chromium.desktop=25,com.github.wwmm.easyeffects.desktop=6,dev.zed.Zed.desktop=8,discord.desktop=21,heroic.desktop=11,io.github.benapetr.TuxManager.desktop=3,looking-glass-client.desktop=2,msty-studio.desktop=18,net.davidotek.pupgui2.desktop=3,org.gnome.SimpleScan.desktop=3,org.keepassxc.KeePassXC.desktop=2,org.mozilla.Thunderbird.desktop=11,steam.desktop=95,transmission-qt.desktop=3,tux-manager.desktop=5,virt-manager.desktop=1,vlc.desktop=1
+powerButtonsMigrated=true
+recentApps=heroic.desktop,steam.desktop,io.github.benapetr.TuxManager.desktop,net.davidotek.pupgui2.desktop,dev.zed.Zed.desktop
+terminalShell=/usr/bin/nu
+
 [Containments][2][General]
-AppletOrder=3;4;5;22
+AppletOrder=57;4;5;22
 
 [Containments][27]
 activityId=
@@ -76,9 +102,8 @@ immutability=1
 plugin=org.kde.plasma.kicker
 
 [Containments][27][Applets][30][Configuration]
-PreloadWeight=100
-popupHeight=550
-popupWidth=300
+popupHeight=640
+popupWidth=312
 
 [Containments][27][Applets][30][Configuration][General]
 favoritesPortedToKAstats=true
@@ -88,7 +113,6 @@ immutability=1
 plugin=org.kde.plasma.digitalclock
 
 [Containments][27][Applets][31][Configuration]
-PreloadWeight=55
 popupHeight=451
 popupWidth=560
 
@@ -123,6 +147,10 @@ plugin=org.kde.plasma.vault
 immutability=1
 plugin=org.kde.plasma.keyboardlayout
 
+[Containments][27][Applets][33][Applets][36][Configuration][ConfigDialog]
+DialogHeight=630
+DialogWidth=810
+
 [Containments][27][Applets][33][Applets][37]
 immutability=1
 plugin=org.kde.plasma.clipboard
@@ -135,18 +163,12 @@ plugin=org.kde.plasma.cameraindicator
 immutability=1
 plugin=org.kde.plasma.volume
 
-[Containments][27][Applets][33][Applets][39][Configuration]
-PreloadWeight=100
-
 [Containments][27][Applets][33][Applets][39][Configuration][General]
 migrated=true
 
 [Containments][27][Applets][33][Applets][40]
 immutability=1
 plugin=org.kde.plasma.devicenotifier
-
-[Containments][27][Applets][33][Applets][40][Configuration]
-PreloadWeight=100
 
 [Containments][27][Applets][33][Applets][41]
 immutability=1
@@ -160,9 +182,6 @@ plugin=org.kde.kscreen
 immutability=1
 plugin=org.kde.plasma.notifications
 
-[Containments][27][Applets][33][Applets][43][Configuration]
-PreloadWeight=55
-
 [Containments][27][Applets][33][Applets][44]
 immutability=1
 plugin=org.kde.plasma.weather
@@ -170,9 +189,6 @@ plugin=org.kde.plasma.weather
 [Containments][27][Applets][33][Applets][45]
 immutability=1
 plugin=org.kde.plasma.networkmanagement
-
-[Containments][27][Applets][33][Applets][45][Configuration]
-PreloadWeight=100
 
 [Containments][27][Applets][33][Applets][46]
 immutability=1
@@ -182,29 +198,17 @@ plugin=org.kde.plasma.keyboardindicator
 immutability=1
 plugin=org.kde.plasma.brightness
 
-[Containments][27][Applets][33][Applets][47][Configuration]
-PreloadWeight=41
-
 [Containments][27][Applets][33][Applets][48]
 immutability=1
 plugin=org.kde.plasma.battery
-
-[Containments][27][Applets][33][Applets][48][Configuration]
-PreloadWeight=26
 
 [Containments][27][Applets][33][Applets][49]
 immutability=1
 plugin=org.kde.plasma.mediacontroller
 
-[Containments][27][Applets][33][Applets][49][Configuration]
-PreloadWeight=0
-
 [Containments][27][Applets][33][Applets][50]
 immutability=1
 plugin=org.kde.plasma.bluetooth
-
-[Containments][27][Applets][33][Applets][50][Configuration]
-PreloadWeight=97
 
 [Containments][27][Applets][33][General]
 extraItems=org.kde.plasma.manage-inputmethod,org.kde.plasma.vault,org.kde.plasma.bluetooth,org.kde.plasma.keyboardlayout,org.kde.plasma.clipboard,org.kde.plasma.cameraindicator,org.kde.plasma.volume,org.kde.plasma.devicenotifier,org.kde.plasma.printmanager,org.kde.plasma.mediacontroller,org.kde.kscreen,org.kde.plasma.notifications,org.kde.plasma.weather,org.kde.plasma.networkmanagement,org.kde.plasma.keyboardindicator,org.kde.plasma.battery,org.kde.plasma.brightness
@@ -219,7 +223,6 @@ immutability=1
 plugin=com.github.k-donn.plasmoid-wunderground
 
 [Containments][27][Applets][53][Configuration]
-PreloadWeight=100
 popupHeight=381
 popupWidth=600
 
@@ -228,11 +231,11 @@ DialogHeight=630
 DialogWidth=810
 
 [Containments][27][Applets][53][Configuration][Station]
-latitude=46.161224
-longitude=2.842825
-savedStations=[{"stationID":"ISAINT7583","address":"Saint-Éloy-les-Mines","latitude":"46.161224","longitude":"2.842825","selected":true}]
-stationID=ISAINT7583
-stationName=Saint-Éloy-les-Mines
+latitude=0
+longitude=0
+savedStations=[{"stationID":"IMONTA428","address":"Saint-Éloy-les-Mines","latitude":"46.161224","longitude":"2.842825","selected":false},{"stationID":"ISAINT7583","address":"Saint-Éloy-les-Mines","latitude":"46.161224","longitude":"2.842825","selected":false},{"stationID":"IAUVERGN53","address":"Néris-les-Bains","latitude":"","longitude":"","selected":false},{"stationID":"IPOUZO5","address":"Pouzol","latitude":"","longitude":"","selected":false},{"stationID":"IPOUZO8","address":"Pouzol","latitude":"","longitude":"","selected":true}]
+stationID=IPOUZO8
+stationName=Pouzol
 
 [Containments][27][Applets][53][Configuration][Units]
 dayChartTimeFormat=H
@@ -242,8 +245,7 @@ immutability=1
 plugin=Plasma.Control.Hub
 
 [Containments][27][Applets][54][Configuration]
-PreloadWeight=75
-popupHeight=358
+popupHeight=440
 popupWidth=324
 
 [Containments][27][Applets][54][Configuration][ConfigDialog]
@@ -255,4 +257,4 @@ AppletOrder=30;28;51;53;33;54;31
 
 [ScreenMapping]
 itemsOnDisabledScreens=
-screenMapping=desktop:/PrimeHack,0,496ef816-3c8f-4056-8c05-e58b01445d37,desktop:/steam.desktop,0,496ef816-3c8f-4056-8c05-e58b01445d37
+screenMapping=desktop:/steam.desktop,0,496ef816-3c8f-4056-8c05-e58b01445d37,desktop:/PrimeHack,0,496ef816-3c8f-4056-8c05-e58b01445d37
