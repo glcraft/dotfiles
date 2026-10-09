@@ -1,4 +1,4 @@
 export EDITOR=nvim
 export PAGER=most
 export PATH=$HOME/.cargo/bin:$PATH
-. "$HOME/.cargo/env"
+[ -z "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"

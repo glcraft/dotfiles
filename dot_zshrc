@@ -147,3 +147,5 @@ fi
 
 # Added by LM Studio CLI (lms)
 export PATH="$PATH:/Users/gly/.cache/lm-studio/bin"
+
+fpath+=~/.zfunc; autoload -Uz compinit; compinit
